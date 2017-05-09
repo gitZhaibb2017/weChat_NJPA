@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.paic.pawj.auth.dao.AdminMapper">
+	<select id="getAdmin" resultType="com.paic.pawj.auth.dao.Admin" parameterType="com.paic.pawj.auth.dao.Admin">
+		select user_id userId, name, pwd pdd, role
+		from
+			pawj_sys_admin
+		where user_id = #{userId}
+		and pwd = #{pdd}
+	</select>
+</mapper>

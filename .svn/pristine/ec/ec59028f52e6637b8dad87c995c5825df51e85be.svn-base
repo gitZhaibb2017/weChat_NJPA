@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.paic.pawj.auth.dao.AuthMapper">
+	<resultMap id="userInfo" type="com.paic.pawj.basic.user.dto.UserInfo">
+		<id column="user_id" property="userId"  />
+		<result column="user_name" property="userName"  />
+	    <result column="mobile" property="mobile"  />
+	    <result column="email" property="email" />
+		<result column="wechat_id" property="wechatId" />
+		<result column="qq_id" property="qqId" />
+		<result column="webo_id" property="weboId" />
+		<result column="pwd" property="pwd" />
+		<result column="recent_login_time" property="recentLoginTime" />
+		<result column="status" property="status" />
+		<result column="corporation_flag" property="corporationFlag" />
+		<result column="certificate_flag" property="certificateFlag" />
+		<result column="family_name" property="familyName"  />
+	    <result column="last_name" property="lastName"  />
+	    <result column="nick_name" property="nickName" />
+		<result column="name" property="name" />
+		<result column="birthday" property="birthday" />
+		<result column="birthday_calender_type" property="birthdayCalenderType" />
+		<result column="id_type" property="idType" />
+		<result column="id_no" property="idNo" />
+		<result column="grade" property="grade" />
+		<result column="vip_class" property="vipClass" />
+		<result column="picture_path" property="picturePath" />
+		<result column="sex" property="sex" />
+		<result column="profession" property="profession" />
+		<result column="card_no" property="cardNo" />
+		<result column="card_status" property="cardStatus" />
+		<result column="rownum" property="level" />
+		<result column="point" property="score" />
+		<result column="balance" property="balance" />
+		<result column="account_id" property="accountId"/>
+		<result column="grade_name" property="gradeName"/>
+	</resultMap>
+	
+	<!-- 根据录入的手机号码、邮箱、账号获得userId -->
+	<select id="queryUserId" resultType="java.util.HashMap" parameterType="com.paic.pawj.auth.dao.Auth">
+		select 
+			user_id userId
+		from
+			pawj_basic_user
+		where 
+			1 = 1
+		<if test="mobile != null">
+			and mobile = #{mobile}
+		</if>
+		<if test="email != null">
+			and email = #{email}
+		</if>
+		<if test="userName != null">
+			and user_name = #{userName}
+		</if>
+		<if test="wechatId != null">
+			and wechat_id = #{wechatId}
+		</if>
+		limit 1
+	</select>
+	
+	<!-- 根据录入的手机号码判定是否可以注册for微信 -->
+	<select id="queryMoblieHasRegister" resultType="Integer" parameterType="map">
+		select 
+			count(1) cnt
+		from
+			pawj_basic_user
+		where 
+			mobile = #{mobile}
+			and ifnull(wechat_id, 0) <![CDATA[ <> ]]> 0
+	</select>
+	
+	<!-- 登录 -->
+	<select id="login" resultMap="userInfo" parameterType="com.paic.pawj.auth.dao.Auth">
+		select 
+			t.user_id,
+			t.user_name,
+			t.mobile,
+			t.email,
+			t.wechat_id,
+			t.qq_id,
+			t.weibo_id,
+			DATE_FORMAT(
+			t.recent_login_time,'%y-%c-%d %h:%i:%s') recent_login_time,
+			t.status,
+			t.corporation_flag,
+			t.certificate_flag,
+			t1.family_name,
+			t1.last_name,
+			t1.nick_name,
+			t1.name,
+			t1.birthday,
+			t1.birthday_calendar_type,
+			t1.id_type,
+			t1.id_no,
+			t1.grade,
+			t1.vip_class,
+			t1.picture_path,
+			t1.sex,
+			t1.profession,
+			t1.card_no,
+			t1.card_status,
+			c.rownum,
+            c.balance,
+            c.point,
+            c.account_id,
+            d.grade_name
+		from 
+			pawj_basic_user t
+		left join
+			pawj_basic_user_info t1
+		on  
+			t.user_id = t1.user_id
+		left join 
+			(
+				SELECT
+					@rownum :=@rownum + 1 AS rownum,
+					user_id,
+					balance,
+					point,
+					account_id
+				FROM
+					account_account,
+					(SELECT @rownum := 0) r
+				ORDER BY
+					balance desc
+			) c
+        on t.user_id = c.user_id
+        left join basic_grade_define d
+        on t1.grade = d.grade
+		where
+			t.user_id = #{userId} 
+			and
+			t.pwd = #{pwd}
+		and
+			t.status = 1
+	</select>
+	
+	<!-- 登录记录 -->
+	<insert id="loginInfo" parameterType="com.paic.pawj.auth.dao.Auth">
+		insert into
+			pawj_basic_user_login
+		(
+			id,
+			user_id,
+			login_time
+		)
+		values
+		(
+			uuid(),
+			#{userId},
+			now()
+		)
+	</insert>
+	
+	<!-- 修改user表，设置最后登录时间 -->
+	<update id="recentLoginTime" parameterType="java.util.HashMap">
+		update 
+			pawj_basic_user 
+		set 
+			recent_login_time = now()
+		where 
+			user_id = #{userId}
+	</update>
+	
+	<!-- 修改user表，设置WechatId -->
+	<update id="updateWechatId" parameterType="java.util.HashMap">
+		update 
+			pawj_basic_user 
+		set 
+			wechat_id = #{wechatId}
+		where 
+			user_id = #{userId}
+	</update>
+	
+	<!-- 注册 -->
+	<insert id="register" parameterType="com.paic.pawj.basic.user.dao.User">
+		insert into
+			pawj_basic_user
+			(
+				user_id,
+				user_name,
+				pwd,
+				mobile,
+				email,
+				wechat_id,
+				qq_id,
+				weibo_id,
+				status,
+				corporation_flag,
+				certificate_flag
+			)
+			values
+			(
+				#{userId},
+				#{userName},
+				#{pwd},
+				#{mobile},
+				#{email},
+				#{wechatId},
+				#{qqId},
+				#{weiboId},
+				1,
+				#{corporationFlag},
+				#{certificateFlag}
+			)
+	</insert>
+	
+	<!--插入用户信息表  -->
+	<insert id="insertUserInfo" parameterType="com.paic.pawj.basic.user.dto.UserInfo">
+	    insert into
+	    		pawj_basic_user_info
+	    		(
+	    			user_id,
+	    			picture_path,
+	    			grade
+	    		)
+	    		values
+	    		(
+	    			#{userId},
+	    			#{picturePath},
+	    			#{grade}
+	    		)
+	</insert>
+	
+	<!--插入account表  -->
+	<insert id="insertAccount" parameterType="com.paic.pawj.basic.user.dto.UserInfo">
+		   insert into
+	    		account_account
+	    		(
+	    			account_id,
+	    			user_id
+	    		)
+	    		values
+	    		(
+	    			uuid(),
+	    			#{userId}
+	    		) 
+	</insert>
+	
+	<!-- 查询userId是否存在 -->
+	<select id="queryUserHasExist" resultType="Integer" parameterType="Map">
+		select 
+			count(1) cnt
+		from 
+			pawj_basic_user t
+		where
+			t.user_id = #{userId}
+	</select>
+	
+	<!-- 校验邀请码是否有效 -->
+	<select id="checkInviteCode" resultType="Integer" parameterType="map">
+		select 
+			count(1) cnt
+		from
+			pawj_basic_invite_code t
+		where
+			t.invite_code = #{inviteCode}
+		and
+			ifnull(t.user_id, '') = '' 
+	</select>
+	
+	<!-- 校验邀请码是否被使用-userId是否存在 -->
+	<select id="checkInviteCodeUsed" resultType="Integer" parameterType="map">
+		select 
+			count(1) cnt
+		from
+			pawj_basic_invite_code t
+		where
+			t.invite_code = #{inviteCode}
+		and
+			t.user_id = #{userId}
+	</select>
+	
+	<!-- 使用邀请码 -->
+	<update id="useInviteCode" parameterType="map">
+		update
+			pawj_basic_invite_code
+		set
+			user_id = #{userId}
+		where
+			invite_code = #{inviteCode}
+		and 
+			ifnull(user_id, '') = '' 
+	</update>
+	
+	<!-- 发送校验码后存入数据库 -->
+	<insert id="insertCheckCode" parameterType="com.paic.pawj.auth.dto.CheckCodeDTO">
+		   insert into
+	    		pawj_basic_check_code
+	    		(
+	    			check_id,
+	    			check_code,
+	    			send_time,
+	    			create_time,
+	    			mobile,
+	    			is_used
+	    		)
+	    		values
+	    		(
+	    			replace(uuid(),'-',''),
+	    			#{checkCode},
+	    			str_to_date(#{sendTime}, '%Y-%m-%d %H:%i:%s'),
+	    			now(),
+	    			#{mobile},
+	    			0
+	    		) 
+	</insert>
+	
+	<!-- 检查校验码是否有效 -->
+	<select id="checkCode" resultType="Integer" parameterType="map">
+		select 
+			count(1) cnt
+		from
+			pawj_basic_check_code t
+		where
+			t.check_code = #{checkCode}
+		and
+			DATE_FORMAT(t.send_time, '%Y-%m-%d %H:%i:%s')
+			<![CDATA[ > ]]>
+ 			DATE_FORMAT(date_sub(#{checkTime}, interval #{minute} minute), '%Y-%m-%d %H:%i:%s')
+ 		and
+ 			t.mobile = #{mobile}
+ 		and 
+ 			t.is_used = 0
+		order by create_time DESC
+		limit 1
+	</select>
+	
+	<!-- 使用校验码 -->
+	<update id="useCheckCode" parameterType="java.util.HashMap">
+		update 
+			pawj_basic_check_code 
+		set 
+			is_used = 1
+		where 
+			mobile = #{mobile}
+		and
+			is_used = 0
+	</update>
+</mapper>

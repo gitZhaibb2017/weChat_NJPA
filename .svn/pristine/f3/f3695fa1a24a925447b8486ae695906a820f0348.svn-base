@@ -1,0 +1,20 @@
+/**
+ * 
+ */
+package com.paic.pawj.test.dao;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * @author happy
+ *
+ */
+@Data
+@NoArgsConstructor
+public class User {
+    private String userID;
+    
+    private String userName;
+
+}

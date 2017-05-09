@@ -1,0 +1,21 @@
+/**
+ * 
+ */
+package com.paic.pawj.investigation.dao;
+
+import java.util.List;
+
+/**
+ * @author admin
+ *
+ */
+public interface AnswererInvestigationMapper {
+
+	/**
+	 *  获取最新问卷列表(分页)
+	 * @param start
+	 * @param pageSize
+	 * @return
+	 */
+	List<AnswererInvestigation> getNewInvPage(AnswererInvestigation answerInv);
+}

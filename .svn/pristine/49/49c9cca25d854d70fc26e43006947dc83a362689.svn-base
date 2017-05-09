@@ -1,0 +1,54 @@
+//获取问卷信息
+$(function() {
+	$('#personPicture').attr('src','../../images/icon_me.png');
+	getPoints();
+	getPointsDetail();
+});
+
+//获取用户积分
+function getPoints() {
+	$.ajax({
+		type : 'POST',
+		url : "/pawj/app/person/queryUserInfo.do",
+		dataType : "JSON",
+		success : function(data) {
+			data = $.parseJSON(data);
+			var score = data.score;
+			var picturePath = data.picturePath;
+			$('#personPicture').attr('src',picturePath);
+			$('#points').text(score);
+		}
+	});
+}
+//获取用户积分详细
+function getPointsDetail() {
+	$.ajax({
+		type : 'POST',
+		url : "/pawj/app/person/queryPoint.do",
+		dataType : "JSON",
+		success : function(data) {
+			data = $.parseJSON(data);
+			var h = "";
+			if(data.infoMsg != 'fail'){
+				$.each(data,function(i,item){
+					var source = item.source;
+					var pointChange = "+" + item.pointChange;
+					var changeTime = item.changeTime;
+					h += '<tr id="points'+ (i + 1)+ '">'
+					+'<td>'+ source + '</td>'
+					+'<td>'+ pointChange + '</td>'
+					+'<td>'+ changeTime + '</td>'
+					+ '</tr>';
+				});
+			}else {
+				h = '<div style="width: 100%;text-align: center;margin-top: 10px;">暂无明细</div>';
+			}
+			$("#pointsDetail").append(h);
+
+		}
+	});
+}
+
+function goBack(){
+	window.history.back();
+};

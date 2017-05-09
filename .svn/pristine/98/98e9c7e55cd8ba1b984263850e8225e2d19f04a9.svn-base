@@ -1,0 +1,198 @@
+package com.paic.pawj.basic.user.servie;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.web.multipart.MultipartFile;
+
+import com.paic.pawj.basic.user.dto.UserInfo;
+
+/**
+ * Description:个人信息接口
+ * 
+ * @author pc1
+ * @version
+ */
+public interface UserInfoService {
+
+	public UserInfo queryUserInfo(UserInfo  fo);
+	
+	
+	public void updateUserInfo(UserInfo fo);
+	
+	
+	public void updateUser(UserInfo fo);
+	
+	public Map<String, Object> isSaveOrUpdate(UserInfo fo);
+	
+	/**
+	 * Description:查询用户详细信息
+	 * 
+	 * @param fo
+	 * @return
+	 */
+	public UserInfo queryAllUserInfo(UserInfo fo);
+	
+	/**
+	 * Description:查询财富排名
+	 * 
+	 * @return
+	 */
+	public List<Map<String, Object>> queryTreasure(UserInfo fo);
+	
+	/**
+	 * Description:查询个人排名
+	 * 
+	 * @param fo
+	 * @return
+	 */
+	public UserInfo queryPersonTreasure(UserInfo fo);
+	
+	/**
+	 * Description:查询个人用户等级排名
+	 * 
+	 * @param fo
+	 * @return
+	 */
+	public UserInfo queryPersonalGrade(UserInfo fo);
+	
+	/**
+	 * Description:查询所有用户等级排名
+	 * 
+	 * @param fo
+	 * @return
+	 */
+	public List<Map<String, Object>> queryAllGrade(UserInfo fo);
+	
+	/**
+	 * Description:查詢分數
+	 * 
+	 * @return
+	 */
+	public List<Map<String, Object>> queryPoint(UserInfo fo);
+	
+	/**
+	 * Description:查询余额详细
+	 * 
+	 * @param fo
+	 * @return
+	 */
+	public List<Map<String, Object>> queryBalanceDetail(UserInfo fo);
+	
+	/**
+	 * Description:查询答题记录
+	 * 
+	 * @param fo
+	 * @return
+	 */
+	public List<Map<String, Object>> queryAnswer(UserInfo fo);
+	
+	/**
+	 * Description:我的调查
+	 * 
+	 * @param fo
+	 * @return
+	 */
+	public List<Map<String, Object>> queryMySurvey(UserInfo fo);
+	
+	/**
+	 * Description:共享调查
+	 * 
+	 * @return
+	 */
+	public List<Map<String, Object>> queryShare();
+	
+	/**
+	 * Description:根据userId修改姓名
+	 * 
+	 * @param userId
+	 */
+	public void updateName(UserInfo fo);
+	
+	/**
+	 * Description:查询姓名是否存在
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public int queryName(String name);
+	
+	/**
+	 * Description:根据userId修改昵称
+	 * 
+	 * @param fo
+	 * @return
+	 */
+	public void updateNickName(UserInfo fo);
+	
+	/**
+	 * Description:查询昵称是否存在
+	 * 
+	 * @param nickName
+	 * @return
+	 */
+	public int queryNickName(String nickName);
+	
+	/**
+	 * Description:根据userId修改密码
+	 * 
+	 * @param fo
+	 * @return
+	 */
+	public void updatePwd(UserInfo fo);
+	
+	/**
+	 * Description:查询原密码
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	public String queryPwd(String userId);
+	
+	/**
+	 * Description:修改性别
+	 * 
+	 * @param fo
+	 * @return
+	 */
+	public void updateSex(UserInfo fo);
+	
+	/**
+	 * Description:修改职业
+	 * 
+	 * @param fo
+	 * @return
+	 */
+	public void updateProfession(UserInfo fo);
+	
+	/**
+	 * Description:修改手机
+	 * 
+	 * @param fo
+	 * @return
+	 */
+	public void updateMobile(UserInfo fo);
+	
+	/**
+	 * Description:修改eamil
+	 * 
+	 * @param fo
+	 * @return
+	 */
+	public void updateEmail(UserInfo fo);
+	
+	/**
+	 * 上传文件-头像
+	 * @return
+	 */
+	public String uploadFile(UserInfo fo, String baseUrl, byte[] bfile, String fileName);
+	
+	/**
+	 * 修改用户信息-单字段修改
+	 */
+	public void updateUserInfoByParamKey(Map<String, Object> paramMap);
+
+
+	public String checkOldPwd(UserInfo fo);
+	
+}

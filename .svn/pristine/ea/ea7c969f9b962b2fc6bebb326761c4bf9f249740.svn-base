@@ -1,0 +1,66 @@
+(function() {
+	
+	// 我的调查
+	$(function() {
+		getRecord();
+		
+		$(".main_container")
+				.on("click",".shareImg",
+						function() {
+							var shareHtml = "<div class='shareImg'>"
+									+ "<img src='../../images/logo_wechat.png' />"
+									+ "<img src='../../images/logo_wechatmoments.png' />"
+									+ "<img src='../../images/logo_qq.png' />"
+									+ "<img src='../../images/logo_sinaweibo.png' />"
+									+ "</div>";
+							var opt = {
+						            id: 'pop-1',
+						            message: shareHtml,
+						            hideTitle: true,
+						            marginBottom:0,
+						            popClass:'sharePop',
+						            cancelOnly : "true",
+						            cnacel : "取消"
+							}
+							// 弹出窗
+							$('body').popup(opt);
+						});
+	});
+
+	// 我的调查
+	function getRecord() {
+		$.ajax({
+					type : 'POST',
+					url : "/pawj/app/person/queryMySurvey.do",
+					contentType : "application/json",
+					success : function(data) {
+						var h = '';
+						if ( data && typeof data !="string") {
+							if(data.length == 0){
+								h +='<div style="text-align:center;margin-top:10px;">暂无调查记录！</div>';
+							}
+							for (var i = 0; i < data.length; i++) {
+								h += '<section class="mysearchContext">';
+								h += "<div><h1>" + data[i].name + "</h1><b>"
+										+ data[i].coefficient + "</b></div>";
+								h += "<div><ul>";
+								h += '<li><span >' + data[i].planCopy
+										+ '</span><i>发出数</i></li>';
+								h += '<li><span >' + data[i].returnCopy
+										+ '</span><i>收回数</i></li>';
+								h += '<li><span >' + data[i].reach
+										+ '</span><i>达成率</i></li>';
+								h += '</ul><label><img alt="" src="../../images/icon_share.png" class="shareImg"/></label></div>';
+								h +='</section>';
+							}
+						} else if(data && typeof data == "string"){
+							var reg = $.parseJSON(data);
+							if(reg.retCode=="9999"){
+								$.popAlert("请先登录");
+							}
+						}
+						$(".mysearchTitle").after(h);
+					}
+				});
+	}
+}());

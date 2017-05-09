@@ -1,0 +1,75 @@
+//答题记录
+$(function() {
+	getRecord();
+});
+// 答题记录
+function getRecord() {
+	getMsg();
+}
+// 获取答题记录全部信息
+function getMsg() {
+	$.ajax({
+		type : 'POST',
+		url : "/pawj/app/person/queryAnswer.do",
+		contentType : "application/json",
+		success : function(data) {
+			var h = "";
+			
+			if(data && typeof data != "string"){
+				if(data.length==0){
+					// 无答题记录的
+						h = '<div id="name" class="problemContent"'
+								+ (i + 1)
+								+ '><h1>'
+								+ "您暂时还没有答题记录,请速答题,得积分中大奖!" + '</h1></div>';
+						$('.recordLabel').hide();
+				}
+				
+				for (var i = 0; i < data.length; i++) {
+					var answerFee = data[i].answerFee;
+					if (answerFee == 'undefined' || answerFee == null) {
+						answerFee = "+" + 0;
+					} else {
+						answerFee = "+" + answerFee;
+					}
+					if (data[i].status == '1') {// 已答完答题
+						
+						
+						h += '<div id="name" class="problemContent"' + (i + 1) + '>' 
+								+ '<div ><h1>' + data[i].name + '</h1><i>'
+								+ data[i].actualEndTime
+								+ '</i></div> <label>' + answerFee
+								+ '</label></div>';
+					} else if (data[i].status == '0') {// 未答完答题
+						h += '<div id="name" class="problemContent"'
+								+ (i + 1)
+								+ ' >'
+								+ '<div><h1>' + data[i].name
+								+ '</h1><i>' + data[i].actualEndTime
+								+ '</i></div><label class="greenFont">' + '答题中'
+								+ '</label></div>';
+					} 
+				}
+			}else if(data && typeof data == "string"){
+				var reg = $.parseJSON(data);
+				if(reg.retCode=="9999"){
+					$.popAlert("请先登录");
+				}
+				h = '<div id="name" class="problemContent"'
+					+ (i + 1)
+					+ '><h2>'
+					+ "暂时还没有答题记录!" + '</h2></div>';
+				$('.recordLabel').hide();
+			}
+			
+			/*else{
+				h = '<div id="name" class="problemContent"'
+					+ (i + 1)
+					+ '><h2>'
+					+ "您暂时还没有答题记录,请速答题,得积分中大奖!" + '</h2></div>';
+				$('.recordLabel').hide();
+			}*/
+			$("header").after(h);
+		}
+	});
+}

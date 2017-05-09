@@ -1,0 +1,21 @@
+$(function(){
+	$('#status').combobox({
+		url : '/pawj/common/queryDic.do?dicCode=qsrStatus',
+		valueField : 'dicValue',
+		textField : 'dicDesc',
+		width : '85px',
+		panelHeight : 'auto',
+		editable : false,
+		onChange : function(record) {
+			// console.log(record);
+		},
+		onLoadSuccess : function() {
+			$('#wj_status').combobox("setValue", parseInt(row.status));
+		}
+	});
+	
+	
+});
+
+
+

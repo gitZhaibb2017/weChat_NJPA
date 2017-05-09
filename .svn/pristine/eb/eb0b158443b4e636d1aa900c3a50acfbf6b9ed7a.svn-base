@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>充值中心</title>
+<link href="../../css/main.css" rel="stylesheet"
+	media="screen and (max-width: 320px)" />
+<link href="../../css/main.css" rel="stylesheet"
+	media="screen and (min-width: 321px) and (max-width: 640px)" />
+<link href="../../css/main.css" rel="stylesheet"
+	media="screen and (min-width: 641px) and (max-width: 2560px)" />
+<link href="../../css/popup.css" rel="stylesheet" media="screen and (max-width: 2560px)" />
+<script type="text/javascript" src="../../../libs/easyui/zepto.js"></script>
+<script type="text/javascript" src="../../js/recharge.js"></script>
+<script type="text/javascript" src="../../js/common/validate_h5.js"></script>
+<script type="text/javascript" src="../../js/personInfo/popup.js"></script>
+</head>
+
+<body>
+	<header>
+		<i id="goBack" onClick="goReChargeBack()"></i><span>充值中心</span>
+	</header>
+
+	<div >
+		<div class="rechargeMoney">
+			<span >充值金额（元）</span>
+		</div>
+		<div class="rechargePng">
+			<img  src="../../images/icon_rmb.png">
+			<input  type="text" id="rechargeMoney" placeholder="单笔最多5000元且受限于充值渠道" />
+		</div>
+		<div class="rechargeMoney">
+			<span>选择充值渠道</span>
+		</div>
+		<div >
+			<table class="reChargeTb">
+				<tr>
+					<td><input type="radio"  name="rechargeChannel"><img  src="../../images/icon_alipay.png"></td>
+					<td><input type="radio"  name="rechargeChannel"><img  src="../../images/icon_cmb.png"></td>
+				</tr>
+				<tr>
+					<td><input type="radio"  name="rechargeChannel"><img  src="../../images/icon_weixin.png"></td>
+					<td><input type="radio"  name="rechargeChannel"><img  src="../../images/icon_unionpay.png"></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<div class="QABtn">
+		<button id="reChargeNext" onclick="goReChargeNext()">下一步</button>
+	</div>
+
+</body>
+</html>

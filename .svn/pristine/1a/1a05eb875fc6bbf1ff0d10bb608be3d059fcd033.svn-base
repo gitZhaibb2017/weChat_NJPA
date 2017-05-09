@@ -1,0 +1,74 @@
+//加载完毕调用
+$(function() {
+	init();
+});
+// 初始化基础方法
+function init() {
+	initClick();
+}
+// 点击事件初始化绑定
+function initClick() {
+	//录入手机号和密码
+	$('#loginIn').on('click', function(e) {
+		login();
+	});
+	// 忘记密码跳转
+	$('#forgetPswd').on('click', function(e) {
+		forgetPswd();
+	});
+	//注册页面跳转
+	$('#registBut').on('click', function(e) {
+		forgetPswd();
+	});
+}
+// 登录方法
+function login() {
+	var telephone = $('#loginName').val().trim();
+	var password = $('#password').val().trim();
+	if (!Validator.validateNull(telephone) && 
+		!Validator.validateNull(password)  && 
+		Validator.validatePassword(password)) {
+		$.ajax({
+			type : 'POST',
+			url : "/pawj/auth/login.do",
+			data : {
+				loginName : telephone,
+				pwd : password
+			},
+			dataType : "JSON",
+			success : function(e) {
+//				var data=$.parseJSON(e);
+				if (!Validator.validateNull(e)) {// 成功  首页
+					sessionStorage.setItem("token",$.parseJSON(e).token);
+					window.location.href = "../homePage/index.html";
+				}else {
+					doAlert("密码有误或用户名不存在");
+				}
+			}
+		});
+	} else if (Validator.validateNull(telephone)) {
+		doAlert("账号为空");
+	} else if (Validator.validateNull(password)) {
+		doAlert("密码为空");
+	} else if (!Validator.validatePassword(password)) {
+		doAlert("密码有误或用户名不存在");
+	}
+}
+
+//忘记密码跳转
+function forgetPswd() {
+	window.location.href = "loginSet_password.html";
+}
+
+//提示消息
+function doAlert(msg_temp) {
+	$alertSpan = $('.login_tips').find('p');
+	$alertSpan.html(msg_temp);
+	$alertSpan.parent().css('display', 'block');
+	setTimeout("doDispear()", 3000);
+}
+// 取消显示提示
+function doDispear() {
+	$alertSpan.parent().css('display', 'none');
+	$alertSpan.html('');
+}

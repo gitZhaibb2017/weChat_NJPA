@@ -1,0 +1,17 @@
+package com.paic.pawj.basic.version.dao;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ *
+ * @author Admin
+ *
+ */
+public interface VersionMapper {
+	/**
+	 * 版本信息查询
+	 * @return
+	 */
+	public List<Map<String, Object>> queryVersionInfo();
+}

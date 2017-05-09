@@ -1,0 +1,29 @@
+package com.paic.pawj.investigation.dao;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class Investigation {
+	private String investigationId;
+	private String name;
+	private String userId;
+	private int questionNum;
+	private double coefficient;
+	private int planCopy;
+	private int returnCopy;
+	private double totalFee;
+	private double actualFee;
+	private double deductFee;
+	private String planStartTime;
+	private String planEndTime;
+	private String status;
+	private String statusDesc;
+	private String actualStartTime;
+	private String actualEndTime;
+	private double answerFee;
+	private String brief;
+	private int start;
+	private int pageSize;
+}

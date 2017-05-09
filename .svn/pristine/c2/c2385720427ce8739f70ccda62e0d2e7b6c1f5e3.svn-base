@@ -1,0 +1,22 @@
+package com.paic.pawj.lottery.service;
+
+import java.util.List;
+
+import com.google.gson.JsonObject;
+import com.paic.pawj.lottery.dao.Partner;
+import com.paic.pawj.lottery.dao.Prize;
+
+public interface LotteryService {
+	
+	public JsonObject vote(String userId);
+
+	public List<Partner> getAllPartners();
+	
+	public Prize getCurrentPrize();
+	
+	public void startVote(String prizeID);
+	
+	public List<Partner> stopVote(String prizeID);
+	
+	public void reload();
+}

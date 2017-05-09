@@ -1,0 +1,31 @@
+package com.paic.pawj.investigationVue.service;
+
+import java.util.List;
+
+import com.paic.pawj.investigationVue.dao.IvtgBaseFormVue;
+import com.paic.pawj.investigationVue.dao.IvtgFormDTO;
+import com.paic.pawj.investigationVue.dao.IvtgFormVue;
+import com.paic.pawj.investigationVue.dao.OptionColumnItem;
+import com.paic.pawj.investigationVue.dao.OptionItem;
+import com.paic.pawj.investigationVue.dao.QuestionsDataVueDto;
+
+public interface IvtgFormVueService {
+	
+	public int saveIvtgBaseFormVue(IvtgBaseFormVue ivtgBaseFormVue);
+	
+	public int saveQuestionsDataVue(QuestionsDataVueDto questionsDataVue);
+	
+	public int saveOptionItem(List<OptionItem> optionItem);
+	
+	public int saveOptionItemColumn(List<OptionColumnItem> optionItemColumn);
+	
+	public boolean saveIvtg(IvtgFormVue IvtgFormVue);
+	
+	
+	/**
+	 * 根据问卷id初始化问卷信息
+	 * @param investigationId
+	 * @return
+	 */
+	public IvtgFormDTO getQuestionById(String investigationId);
+}

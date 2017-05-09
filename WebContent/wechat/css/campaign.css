@@ -1,0 +1,187 @@
+@charset "UTF-8";
+.campaign .c-empty {
+	display: block;
+	position: relative;
+	height: 26rem;
+	padding: 50rem 0 20rem 0;
+	text-align: center;
+	line-height: 7rem;
+	font-size: 4.2rem;
+	color: #999;
+}
+.campaign .c-empty:before {
+	content: "";
+	position: absolute;
+	height: 45rem;
+	top: 10rem;
+	left: 0;
+	right: 0;
+	background: url(../img/pic.png) no-repeat center;
+	background-size: 90% 90%;
+}
+.campaign .c-empty:after {
+	content: " 您还没有上传过照片！";
+	position: absolute;
+	height: 8rem;
+	left: 0;
+	right: 0;
+	top: 65rem;
+	line-height: 8rem;
+	text-align: center;
+	font-size: 6.4rem;
+	color: #252525;
+}
+.campaign .c-btn_01,
+.upload .c-btn_01 {
+	display: block;
+	width: 30rem;
+	height: 8.8rem;
+	margin: 10rem auto 5rem auto;
+	background: url(../img/button.png) no-repeat center;
+	background-size: 100%;
+}
+/* 时间轴 start */
+.campaign .c-lst {
+	display: flex;
+	flex-direction: column;
+	font-size: 4.2rem;
+}
+.campaign .c-lst li {
+	display: flex;
+  	flex-direction: row;
+	margin: 0 0 5rem 0;
+	padding: 2rem 10rem 2rem 5rem;
+	background-color: #fff;
+}
+.campaign .c-lst li > div:first-child {
+	display: flex;
+	flex-direction: column;
+	width: 15rem;
+}
+.campaign .c-lst li > div:last-child {
+	flex: 1;
+}
+.campaign .c-lst li > div:first-child span {
+	margin-bottom: 2rem;
+	color: #df7777;
+}
+.campaign .c-lst h1 {
+	margin-bottom: 0.5rem;
+	font-weight: 500;
+  	font-size: 4.2rem;
+}
+.campaign .c-lst li > div:first-child font {
+	color: #666;
+}
+
+.campaign .c-lst li img {
+	width: 30%;
+	height: 20rem;
+	margin: 0.5rem;
+}
+.campaign .c-lst li > div:last-child font {
+	display: block;
+  	color: #666;
+}
+.campaign .c-lst li > div:last-child a {
+	float: right;
+	margin-top: -4.2rem;
+	font-size: 3.2rem;
+	color: #999;
+	cursor: pointer;
+}
+.campaign .c-lst li > div:last-child span {
+	word-break: break-all;
+}
+/* 上传照片模块样式 start */
+.upload {
+	width: 100%;
+	height: 100%;
+	background-color: #efeff4;
+}
+.upload .u-text {
+	padding: 2rem 5rem;
+  	background-color: #fff;
+}
+.upload textarea {
+	width: 100%;
+	height: 20rem;
+	border: 0;
+	font-size: 4.8rem;
+}
+.upload div.u-time {
+	display: flex;
+	flex-direction: row;
+	margin: 5rem 0;
+	background-color: #fff;
+	line-height: 8rem;
+}
+.upload div.u-time span {
+	display: block;
+	height: 8rem;
+	margin: 0 6rem 0 6rem;
+	line-height: 10rem;
+	font-size: 4.8rem;
+	white-space: nowrap;
+}
+.upload input[type="date"] { 
+	border: 0; 
+	outline:0;
+	-webkit-appearance: none;
+}
+.upload input {
+	flex: 1;
+	height: 8rem;
+	border: 0;
+	font-size: 4.8rem;
+	background-color: #fff;
+	border: 0; 
+}
+.upload div.u-ai {
+	display: table;
+	width: 100%;
+	padding-bottom: 6rem;
+	background-color: #fff;
+}
+.upload div.u-img {
+	padding: 6rem 6rem 0 6rem;
+	margin: 0 auto;
+	background-color: #fff;
+}
+.upload div.u-img a {
+	display: table;
+	position: relative;
+	float: left;
+	width: 30%;
+	height: 25rem;
+	margin: 1rem;
+}
+.upload div.u-img img {
+	width: 100%;
+	height: 100%;
+}
+.upload div.u-img span.del {
+	display: block;
+	position: absolute;
+	width: 6rem;
+	height: 6rem;
+	top: -1rem;
+	right: -1rem;
+	font-size: 6.2rem;
+	background-color: #999;
+	color: #fff;
+	border-radius: 50%;
+	text-align: center;
+	line-height: 6rem;
+}
+.upload font.u-f {
+	display: block;
+	font-size: 4.2rem;
+	color: #999;
+	margin: 1rem auto;
+	text-align: center;
+	line-height: 8rem;
+}
+.upload div.u-fi {
+	margin-top: 0;
+}

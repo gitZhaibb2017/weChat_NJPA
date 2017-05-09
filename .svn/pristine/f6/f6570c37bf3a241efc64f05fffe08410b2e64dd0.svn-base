@@ -1,0 +1,13 @@
+package com.paic.pawj.investigationVue.dao;
+
+import java.util.List;
+
+public interface IvtgBaseFormVueMapper {
+	public int saveIvtgBaseFormVue(IvtgBaseFormVue ivtgBaseFormVue);
+	
+	public int saveQuestionsDataVue(QuestionsDataVueDto questionsDataVue);
+	
+	public int saveOptionItem(List<OptionItem> optionItem);
+	
+	public int saveOptionItemColumn(List<OptionColumnItem> optionItemColumn);
+}

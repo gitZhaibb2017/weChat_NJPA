@@ -1,0 +1,99 @@
+package com.paic.pawj.investigationVue.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.paic.pawj.investigationVue.dao.IvtgBaseFormVue;
+import com.paic.pawj.investigationVue.dao.IvtgFormVue;
+import com.paic.pawj.investigationVue.dao.OptionColumnItem;
+import com.paic.pawj.investigationVue.dao.OptionItem;
+import com.paic.pawj.investigationVue.dao.QuestionsDataVue;
+import com.paic.pawj.investigationVue.dao.QuestionsDataVueDto;
+import com.paic.pawj.investigationVue.service.IvtgFormVueService;
+
+@Controller
+@RequestMapping("/investigationVue/")
+public class IvtgFormVueController {
+
+	private static final Log LOG = LogFactory.getLog(IvtgFormVueController.class);
+	
+	@Autowired
+	IvtgFormVueService ivtgFormVueService;
+
+	@RequestMapping("saveInvestigationVue.do")
+	@ResponseBody
+	public String saveInvestigation(IvtgFormVue IvtgFormVue) {
+		Gson gson = new Gson();
+		IvtgBaseFormVue ivtgBaseForm = 
+				gson.fromJson(IvtgFormVue.getIvtgBaseForm(), IvtgBaseFormVue.class);
+		List<QuestionsDataVue> questionsData =gson.fromJson(IvtgFormVue.getQuestionsData(),new TypeToken<List<QuestionsDataVue>>(){}.getType());
+		UUID uuid=UUID.randomUUID();
+		if(ivtgBaseForm.getTime().length>0){
+			String startTime=ivtgBaseForm.getTime()[0].replace("T", " ").replace("Z", "");
+			String endTime=ivtgBaseForm.getTime()[0].replace("T", " ").replace("Z", "");
+			ivtgBaseForm.setPlanStartTime(startTime);
+			ivtgBaseForm.setPlanEndTime(endTime);
+		}
+		ivtgBaseForm.setInvestigationId(uuid.toString());
+		ivtgBaseForm.setQuestionNum(questionsData.size());
+		ivtgFormVueService.saveIvtgBaseFormVue(ivtgBaseForm);
+		if(questionsData.size()>0){
+			this.saveQuestion(questionsData,uuid.toString());
+		}
+		return null;
+		
+	}
+	
+	private void saveQuestion(List<QuestionsDataVue> questionsDataVue,String uuid){
+		List<OptionItem> optList=new ArrayList<OptionItem>();
+		List<OptionColumnItem> optcList=new ArrayList<OptionColumnItem>();
+		for (QuestionsDataVue qdv : questionsDataVue) {
+			QuestionsDataVueDto qdvdDto=new QuestionsDataVueDto();
+			String qid=UUID.randomUUID().toString();
+			//问题
+			qdvdDto.setInvestigationId(uuid);
+			qdvdDto.setQuestionsId(qid);
+			qdvdDto.setOptionType(qdv.getOptionType());
+			qdvdDto.setSeq(qdv.getSeq());
+			qdvdDto.setQues(qdv.getQues());
+			ivtgFormVueService.saveQuestionsDataVue(qdvdDto);
+			int optcode=0;
+			for (OptionItem opt : qdv.getOptionItems()) {
+				String oid=UUID.randomUUID().toString();
+				//选项
+				opt.setOptionId(oid);
+				opt.setOptionCode(optcode);
+				optcode++;
+				opt.setQuestionsId(qid);
+				optList.add(opt);
+			}
+			int optccode=0;
+			if(qdv.getOptionColumnItems()!=null){
+				for (OptionColumnItem optc : qdv.getOptionColumnItems()) {
+					String matrixId=UUID.randomUUID().toString();
+					//选项
+					optc.setMatrixId(matrixId);
+					optc.setOptionId(qid);
+					optc.setDisplayOrder(optccode);
+					optccode++;
+					optcList.add(optc);
+				}
+			}
+			
+			
+		}
+		
+		ivtgFormVueService.saveOptionItem(optList);
+		ivtgFormVueService.saveOptionItemColumn(optcList);
+	}
+}

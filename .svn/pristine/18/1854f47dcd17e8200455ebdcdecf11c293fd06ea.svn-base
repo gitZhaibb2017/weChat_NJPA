@@ -1,0 +1,146 @@
+var app = angular.module("questionWin", []);
+app.controller("questionCtrl", [ '$scope', '$http', function($scope, $http) {
+
+	$scope.questions = [];
+	var obj = {};
+	obj.name = "";
+	obj.type = "";
+	
+	
+	$scope.allSeqArr = [];
+	
+	var getAllSeq = function(){
+		var size = $scope.questions.length;
+		var allSeqArr = [];
+		for(var i=1;i<=size;i++){
+			allSeqArr.push(i);
+		}
+		$scope.allSeqArr = allSeqArr;
+	}
+
+	var forZeroObj = angular.copy(obj);
+	forZeroObj.seq=1;
+	$scope.questions.push(forZeroObj);
+
+	$http({
+		url : '/pawj/common/queryDic.do?dicCode=invsType',
+		method : 'POST'
+	}).success(function(data, header, config, status) {
+		// 响应成功
+		$scope.qstTypes = data;
+		if($("#qsrId").val()&&$("#qsrId").val()!=''){
+			obj.investigationId = $("#qsrId").val();
+			$http({
+				url : '/pawj/investigation/queryQuestionInfo.do',
+				method : 'POST',
+				params :{qsrId:$("#qsrId").val()}
+			}).success(function(data, header, config, status) {
+				// 响应成功
+				$scope.questions = data.root;
+				
+				if(!$scope.questions || $scope.questions.length == 0){
+					var forZeroObj = angular.copy(obj);
+					forZeroObj.seq=1;
+					$scope.questions.push(forZeroObj);
+				}
+				
+				getAllSeq();
+				
+			}).error(function(data, header, config, status) {
+				// 处理响应失败
+			});
+		}
+	}).error(function(data, header, config, status) {
+		// 处理响应失败
+	});
+
+	$scope.delQuestion = function(obj,num) {
+		var seq=obj.seq;
+		if(!seq){
+			seq="未设置";
+		}
+					$.messager
+					.confirm(
+							'删除提示',
+							'是否确认删掉题号为'+seq+'的题目'+(num)+'？',
+							function(r) {
+								if (r) {
+									$scope.questions.splice($scope.questions.indexOf(obj), 1);
+									getAllSeq();
+									$scope.setBigger();
+								}
+							});
+		
+	}
+	
+	$scope.setBigger = function(){
+		for(var i=0;i<$scope.questions.length;i++){
+			if($scope.questions[i].seq>$scope.questions.length){
+				$scope.questions[i].seq="";
+				window.parent.alertSth("请重新设置问题"+(i+1)+"的问题序号！");
+			}
+		}
+		$scope.$apply();
+	}
+
+	$scope.addQuestion = function() {
+		var newObj= angular.copy(obj);
+		$scope.questions.push(newObj);
+		getAllSeq();
+		newObj.seq = $scope.questions.length;
+	}
+
+	$scope.saveQuestion = function(valid) {
+		if(!valid){
+			window.parent.openQuestionMan();
+			return;
+		}
+		
+		var hasAddedSeqs = [];
+		for(var i=0;i<$scope.questions.length;i++){
+			if(hasAddedSeqs.indexOf($scope.questions[i].seq)>-1){
+				$.messager.alert('警告', "题目"+(i+1)+"的题目序号与题目"+(hasAddedSeqs.indexOf($scope.questions[i].seq)+1)+"的题目序号重复，都是"+$scope.questions[i].seq+"！", 'warning');
+				window.parent.openQuestionMan();
+				return;
+			}
+			hasAddedSeqs.push($scope.questions[i].seq);
+		}
+		
+		var saveStr = JSON.stringify($scope.questions);
+		
+		$http({
+			url : '/pawj/investigation/saveSubQuestion.do',
+			method : 'POST',
+			data : {
+				"jsonData" : saveStr
+			}
+		}).success(function(data, header, config, status) {
+			// 响应成功
+			window.parent.closeWindow();
+		});
+		
+		
+
+	}
+	
+	$scope.setQuestionContext = function(obj){
+		if((obj.questionType=='mc'||obj.questionType=='mcs'||obj.questionType=='scr')&&(!obj.options||obj.options.length == 0)){
+			obj.options = [];
+			var objOption = {};
+			obj.options.push(angular.copy(objOption));
+			obj.options.push(angular.copy(objOption));
+		}
+	}
+	
+	$scope.addOption = function(obj){
+			var objOption = {};
+			objOption.opdesc = "";
+			obj.push(objOption);
+	}
+	
+	$scope.delOption = function(subObj,obj){
+		obj.options.splice(obj.options.indexOf(subObj),1);
+	}
+
+
+} ]);

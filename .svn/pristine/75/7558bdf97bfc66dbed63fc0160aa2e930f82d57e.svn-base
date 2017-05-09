@@ -1,0 +1,16 @@
+package com.paic.pawj.lottery.dao;
+
+import java.util.List;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@Data
+public class Winners {
+	
+	private int prizeID;
+	
+	private List<String> partners;
+
+}

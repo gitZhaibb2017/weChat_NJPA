@@ -1,0 +1,123 @@
+package com.paic.pawj.answer.service.impl;
+
+import java.sql.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.paic.pawj.answer.dao.InvestigationComment;
+import com.paic.pawj.answer.dao.InvestigationCommentMapper;
+import com.paic.pawj.answer.dao.InvestigationScore;
+import com.paic.pawj.answer.dto.Answers;
+import com.paic.pawj.answer.service.AnswersService;
+import com.paic.pawj.answer.service.InvestigationCommentAppService;
+import com.paic.pawj.answer.vo.CommentVO;
+import com.paic.pawj.answer.vo.InvestigationCommentVO;
+import com.paic.pawj.basic.comment.dao.Comment;
+import com.paic.pawj.basic.comment.dao.CommentMapper;
+
+@Service
+public class InvestigationCommentAppServiceImpl implements InvestigationCommentAppService {
+
+	@Resource
+	private CommentMapper commentDAO;
+
+	@Resource
+	private InvestigationCommentMapper investigationCommentDAO;
+
+	@Autowired
+	private AnswersService answersService;
+
+	@Override
+	@Transactional
+	public void saveInvestigationComment(
+			InvestigationCommentVO invCommentVO)
+	{
+		String newComment = null;
+		InvestigationComment  invComment = null;
+		String tmpID = null;
+		for (CommentVO cVO : invCommentVO.getComments()){
+			tmpID = cVO.getCommentID();
+			//tmpID一定存在
+			commentDAO.updateCommentCount(Integer.parseInt(tmpID));
+			newComment = cVO.getComment();				
+			
+			invComment = new InvestigationComment();
+			invComment.setInvestigationID(invCommentVO.getQsrId());
+			invComment.setAnswerer(invCommentVO.getAnswerer());
+			invComment.setCommentID(Integer.parseInt(tmpID));
+			invComment.setCreateTime(new Date(System.currentTimeMillis()));
+			
+			//判断记录是否存在
+			int count = investigationCommentDAO.haveItvgCommentExist(invComment);
+			if(count == 0){
+				investigationCommentDAO.addInvestigationComment(invComment);
+			}
+				
+		}
+		
+		tmpID = String.valueOf(saveBasicComent(newComment, invCommentVO));
+		
+		updateRecordByUserIdFromZeroToOne(invCommentVO);
+		
+		saveInvestigationScore(invCommentVO);
+	}
+	
+	//修改答题记录的状态 0改成1 	1  代表已完成
+	private void updateRecordByUserIdFromZeroToOne(InvestigationCommentVO invCommentVO) {
+		Answers answer = new Answers();
+		answer.setQuestMark("0");
+		String userId= invCommentVO.getAnswerer();
+		answer.setInvestigationId(invCommentVO.getQsrId());
+		answersService.operLastQuestion(answer,userId);
+	}
+
+	private int saveBasicComent(
+			String newComment, InvestigationCommentVO invCommentVO)
+	{
+		int commentID = 0;
+		if (StringUtils.isNotBlank(newComment)){
+			Comment comment = new Comment();
+			comment.setComment(newComment);
+
+			Comment sameComment = commentDAO.getSameComment(comment);
+			if (null != sameComment)
+			{
+				commentID = sameComment.getCommentId();
+				commentDAO.updateCommentCount(commentID);
+			}
+			else
+			{
+				comment.setStatus("1");
+				comment.setCommentType("ivtg");
+				comment.setPublisher(invCommentVO.getAnswerer());
+				comment.setCreateTime(new Date(System.currentTimeMillis()));
+				comment.setInvestigationId(invCommentVO.getQsrId());
+				commentDAO.saveComment(comment);
+				commentID = comment.getCommentId();
+			}
+		}
+
+		return commentID;
+	}
+
+	private void saveInvestigationScore(InvestigationCommentVO invCommentVO)
+	{
+		InvestigationScore investigationScore = new InvestigationScore();
+		investigationScore.setAnswerer(invCommentVO.getAnswerer());
+		investigationScore.setInvestigationID(invCommentVO.getQsrId());
+		investigationScore.setScore(invCommentVO.getScore());
+		investigationCommentDAO.addInvestigationScore(investigationScore);
+	}
+
+	@Override
+	public List<InvestigationComment> queryHottestComments() {
+		return investigationCommentDAO.queryHottestComments();
+	}
+	
+}

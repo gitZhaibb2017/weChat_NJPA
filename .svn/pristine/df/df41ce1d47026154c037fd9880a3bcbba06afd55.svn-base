@@ -1,0 +1,80 @@
+/**
+ * 页面初始化-加载数据
+ */
+$(function() {
+	
+	/**
+	 * 绑定邮箱 发送邮箱验证码
+	 */
+	$("#getEmailCode").click(function() {
+		$("#emailTip ").css({"display":"block"});
+		$(".unbindEmail ").css({"margin-top":"0px"});
+		var that = $(this);
+		var opts = {
+			time : 60,
+			onSet : function() {
+				that.attr("disabled", "disabled");
+				that.html(this.time + "秒后重新获取");
+			},
+			onClear : function() {
+				that.html("重新获取");
+				that.removeAttr("disabled");
+				// that.css({color:'#fe6446'});
+			},
+			onBefore : function() {
+				that.attr("disabled", "disabled");
+				that.html(this.time + "秒后重新获取");
+			}
+		}
+		new WJInterval(opts);
+	});
+	/**
+	 * 解绑邮箱提交
+	 */
+	$("#bindEmailSubBtn").click(function() {
+		// 校验验证码
+		if (!Validator.validateCode($("#bindEmailCode").val())) {
+			$.popAlert("请输入6位数字验证码！");
+			return false;
+		}
+	});
+	
+	
+	/**
+	 * 获取个人信息 
+	 */ 
+	$.ajax({
+		type : 'POST',
+		url :"/pawj/app/person/queryUserInfo.do",
+		dataType : "JSON",
+		success : function(dat) {
+			var data = $.parseJSON(dat);
+			var email = data.email;//邮箱
+			var mobile = data.mobile;//手机
+			if(email){
+				var emailArr = email.split("@");
+				$("#unbindEmail").html(CommonTool.starStr(emailArr[0],2,1)+"@"+emailArr[1]);
+				//启动定时器
+				//$("#getEmailCode").click();
+			}
+			if(mobile){
+				$("#otherUnbind").css({"display":"block"});
+			}
+		}
+	});
+	
+	//监听表单变化
+	$("#unbindEmailSec").changeListen({
+		formId : "#unbindEmailSec",
+		onOK : function() {
+			$("#bindEmailSubBtn").css({
+				background : "#ffb71d"
+			}).removeAttr("disabled");
+		},
+		onCancel : function() {
+			$("#bindEmailSubBtn").css({
+				background : "#ccc"
+			}).attr("disabled","disabled");
+		}
+	});
+});

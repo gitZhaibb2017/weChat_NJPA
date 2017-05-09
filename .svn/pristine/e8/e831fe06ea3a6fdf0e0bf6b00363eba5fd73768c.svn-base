@@ -1,0 +1,59 @@
+package com.paic.pawj.wechat.service.impl;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.google.gson.Gson;
+import com.paic.pawj.basic.interceptor.SessionUserInfo;
+import com.paic.pawj.basic.redis.RedisClient;
+import com.paic.pawj.wechat.dao.WechatUser;
+import com.paic.pawj.wechat.dao.WechatUserMapper;
+import com.paic.pawj.wechat.service.OAuth2Service;
+
+@Service
+public class OAuth2ServiceImpl implements OAuth2Service {
+
+	private static final String WX_OPENID_PIX = "wechat.openid.";
+	
+	@Autowired
+	private RedisClient redisClient;
+	
+	@Resource
+	private WechatUserMapper wechatUserDAO;
+	
+	
+	@Override
+	public SessionUserInfo getUserInfoByOpenid(String id) {
+		String userInfoStr = redisClient.get(WX_OPENID_PIX + id);
+		SessionUserInfo userInfo = null;
+		if (StringUtils.isNotBlank(userInfoStr))
+		{
+			Gson gson = new Gson();
+			userInfo = gson.fromJson(userInfoStr, SessionUserInfo.class);
+			
+			Long time = redisClient.pttl(WX_OPENID_PIX + id);
+			if (time < 5 * 24 * 3600 * 1000) {
+				redisClient.expire(WX_OPENID_PIX + id, 7 * 24 * 3600);
+			}
+		}
+		else
+		{
+			WechatUser user = wechatUserDAO.getUserByOpenid(id);
+			if (null != user)
+			{
+				userInfo = new SessionUserInfo();
+				userInfo.setUserId(user.getUserID());
+				userInfo.setUserName(user.getUserName());
+				
+				Gson gson = new Gson();
+				redisClient.set(WX_OPENID_PIX + id, gson.toJson(userInfo));
+				redisClient.expire(WX_OPENID_PIX + id, 7 * 24 * 3600);
+			}
+		}
+		return userInfo;
+	}
+
+}

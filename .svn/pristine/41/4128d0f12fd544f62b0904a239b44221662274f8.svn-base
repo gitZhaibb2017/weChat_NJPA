@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html class="bgGray">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>解绑邮箱</title>
+<link href="../../css/main.css" rel="stylesheet"
+	media="screen and (max-width: 320px)" />
+<link href="../../css/main.css" rel="stylesheet"
+	media="screen and (min-width: 321px) and (max-width: 640px)" />
+<link href="../../css/main.css" rel="stylesheet"
+	media="screen and (min-width: 641px) and (max-width: 2560px)" />
+<link href="../../css/popup.css" rel="stylesheet"
+	media="screen and (max-width: 2560px)" />
+<script type="text/javascript" src="../../../libs/easyui/zepto.js"></script>
+<script type="text/javascript" src="../../js/common/common.js"></script>
+<script type="text/javascript" src="../../js/personInfo/unbindmail.js"></script>
+<script type="text/javascript" src="../../js/personInfo/popup.js"></script>
+<script type="text/javascript" src="../../js/common/validate_h5.js"></script>
+
+</head>
+
+<body>
+	<header>
+		<i></i><span>解绑邮箱</span>
+	</header>
+
+	<section class="emailTip">
+		<i>邮箱验证码已发送至：</i><span id="unbindEmail"></span>
+	</section>
+	<section class="unbindEmail" id="unbindEmailSec">
+		<ul>
+			<li><span>邮箱验证码</span><span><input type="text" class=""
+					id="bindEmailCode" placeholder="输入邮箱验证码" />
+				<button class="getEmailCode" id="getEmailCode">获取验证码</button></span></li>
+
+		</ul>
+		<footer>
+			<button class="subBtn" id="bindEmailSubBtn" disabled>确定</button>
+		</footer>
+	</section>
+</body>
+</html>

@@ -1,0 +1,7 @@
+package com.paic.pawj.basic.comment.dao;
+
+public interface CommentMapper {
+	public void saveComment(Comment comment);
+	
+	public Comment getSameComment(Comment comment);
+}

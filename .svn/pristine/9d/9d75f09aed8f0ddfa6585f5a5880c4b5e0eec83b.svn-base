@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.paic.pawj.investigation.dao.AnswererInvestigationMapper">
+	<select id="getNewInvPage" parameterType="com.paic.pawj.investigation.dao.AnswererInvestigation" 
+	        resultType="com.paic.pawj.investigation.dao.AnswererInvestigation">
+		select t1.investigation_id investigationId,
+		       t1.name investigationName,
+           IF(t2.user_id is NULL,0,1) userCompleted,
+		       1 completionRate,
+		       answer_fee answerFee
+		from pawj_busi_investigation t1
+    left join pawj_sur_answers_record t2 
+     on t1.investigation_id = t2.investigation_id and t2.user_id=#{userID} and t2.answer_status='1'
+		order by actual_start_time desc
+		limit #{start}, #{end}
+	</select>
+</mapper>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>我的设置</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link href="../../css/main.css" rel="stylesheet"/> 
+<link href="../../css/main2.css" rel="stylesheet"/>  
+<link href="../../css/popup.css" rel="stylesheet"/>
+<link href="../../css/popup.css" rel="stylesheet" media="screen and (max-width: 2560px)"/>
+<script type="text/javascript" src="/pawj/libs/easyui/zepto.js"></script>
+<script type="text/javascript" src="../../js/personInfo/userInfo.js"></script>
+<script type="text/javascript" src="../../js/personInfo/popup.js"></script>
+<script type="text/javascript" src="../../js/common/validate_h5.js"></script>
+<script type="text/javascript" src="../../js/common/common.js"></script>
+</head>
+<body class="bgWhite">
+	<header>
+		<i></i> <span class="span">我的设置</span>
+	</header>
+	<div>
+		<div class="photoDiv">
+			<div class="photoInner">
+				<img src="" onerror="onError();" class="photo">
+				<form class="uploadFile" id="uploadForm" enctype="multipart/form-data" method="post">
+					<input name="file" id="uploadFile" type="file" onchange="uploadPic()">
+				</form>
+				<img src="../../images/icon_photo.png" class="photo_ca">
+			</div>
+			<br/>
+			<p></p>
+		</div>
+	</div>
+	<div class="lineInfo2">
+		<ul>
+			<li><span>姓名</span><span><img
+					src="../../images/icon_open.png"></span><span id="name"></span></li>
+			<li><span>昵称</span><span><img
+					src="../../images/icon_open.png"></span><span id="nickName"></span></li>
+			<li><span>性别</span><span><img
+					src="../../images/icon_open.png"></span><span id="sex"></span></li>
+			<li><span>职业</span><span><img
+					src="../../images/icon_open.png"></span><span id="profession"></span></li>
+		</ul>
+	</div>
+		<p></p><div class="integralDetail2">完善身份资料</div><p></p>
+		
+	<div class="lineInfo">
+		<ul>
+			<li>
+				<span>实名认证</span>
+				<span>
+<!-- 					<a href="real-name.html">未认证</a> -->
+					<a id="certification">未认证</a>
+				</span>
+				<span>
+				</span>
+			</li>
+			<li><span>绑定手机</span><span id="blind"><span id="jie"></span></span><span id="mobile" class="sp_mb"></span></li>
+			<li><span>绑定邮箱</span><span id="blind2"></span><span id="email" class="sp_el"></span></li>
+			<li class="pw"><span>修改密码</span><span><img
+					src="../../images/icon_open.png"></span><span ></span></li>
+		</ul>
+	</div>
+
+	<div>
+		<form id="form-1"></form>
+	</div>
+    <footer id="footer">
+           <input type="reset" class="res" value="退出登录" onclick="loginOut()"/>
+    </footer>
+</body>
+</html>

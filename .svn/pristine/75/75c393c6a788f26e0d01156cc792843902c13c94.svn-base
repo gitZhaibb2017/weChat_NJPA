@@ -1,0 +1,123 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="/pawj/libs/easyui/jquery.min.js"></script>
+<script type="text/javascript"
+	src="/pawj/libs/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript"
+	src="/pawj/libs/easyui/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="/pawj/partner/js/partnerList.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="/pawj/libs/easyui/themes/default/easyui.css" />
+<link rel="stylesheet" type="text/css"
+	href="/pawj/libs/easyui/themes/icon.css" />
+<style>
+.datagrid-pager .pagination {
+	postion: absolute;
+	botton: 0px;
+}
+</style>
+
+
+</head>
+<body class="easyui-layout" fit="true">
+<div region="center" border="false" style="overflow: true;">
+	
+	<div id="toolbar" class="datagrid-toolbar" style="height:auto;display:true;">
+	<a id="qry_btn" href="#" class="easyui-linkbutton"
+	 data-options="iconCls:'icon-add'" onclick="addPartner();" >添加中奖人员</a>
+	</div>
+	
+	<table id="partnerQuery" title="中奖人员查询" border="0" cellspacing="0"
+		cellpadding="1px " iconCls="icon-edit"
+		idField="investigationId" pagination="true" remoteSort="false"
+		singleSelect="false" pagePosition="bottom" showFooter="true"
+		checkOnSelect="false" split="true" striped="true" rownumbers="true">
+		
+	</table>
+	<!-- 添加 -->
+	<div id="addPartner" class="easyui-dialog" data-options="title:'中奖人员添加',
+	toolbar:'#dtb',modal:true"
+	 style="width:400px;height:220px;padding:10px" class="dicTable" closed=true >
+		
+			<table>
+				 <tr>
+					<td><label>人员编号：</label></td>
+					<td><input type="text" class="easyui-validatebox"
+						id="userId" maxlength="20" required="true" ></input></td>
+				</tr>
+				<tr>
+					<td><label>人员名称：</label></td>
+					<td><input type="text" class="easyui-validatebox"
+						id="userName" maxlength="20" required="true"></input></td>
+				</tr>
+				<tr>
+					<td><label>中奖状态：</label></td>
+					<td><select id="status" class="easyui-combobox" style="width:80px;" panelHeight="90">
+							<option value="-1">请选择</option>
+							<option value="0">未中奖</option>
+							<option value="1">已中奖</option>
+							<option value="2">无效</option>
+						</select></td>
+				</tr>
+				<tr>
+					<td><label>请求路径:</label></td>
+					<td><input type="text" class="easyui-validatebox" 
+					style="width:260px;"
+					id = "path" maxlength="10"/></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>
+						<a href="#" class="easyui-linkbutton" icon="icon-ok"
+						onclick="partnerAdd();">提交</a> <a href="#"
+						class="easyui-linkbutton" icon="icon-redo"
+						onclick="partnerReset();">重置</a></td>
+					</td>
+				</tr>
+			</table>
+		
+	</div>
+	<!--修改  -->
+	<div id="updatePartner" class="easyui-dialog" data-options="title:'中奖人员编辑',toolbar:'#dtb',modal:true" style="width:400px;height:220px;padding:10px" class="dicTable" closed=true >
+		<form id="updatePartner"  method="post">
+			<table>
+				<tr>
+					<td><label>人员编号：</label></td>
+					<td><input type="text" class="easyui-validatebox"
+						id="updateUserId" maxlength="20" readonly="readonly" disabled="disabled" >
+						</input></td>
+				</tr>
+				<tr>
+					<td><label>人员名称：</label></td>
+					<td><input type="text" class="easyui-validatebox"
+						id="updateUserName" maxlength="20" ></input></td>
+				</tr>
+				<tr>
+					<td><label>中奖状态：</label></td>
+					<td><select id="updateStatus" class="easyui-combobox" style="width:80px;" panelHeight="70">
+							<option value="0">未中奖</option>
+							<option value="1">已中奖</option>
+							<option value="2">无效</option>
+						</select></td>
+				</tr>
+				<tr>
+					<td><label>路径:</label></td>
+					<td><input type="text" class="easyui-validatebox" 
+					style="width:260px;"
+					id = "updatePath" maxlength="200"/></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><a href="#" class="easyui-linkbutton" icon="icon-ok"
+						onclick="updatePartnerAdd();">提交</a> <a href="#"
+						class="easyui-linkbutton" icon="icon-redo"
+						onclick="partnerClose();">关闭</a></td>
+				</tr>
+			</table>
+		</form>
+	</div>
+</div>
+</body>
+</html>

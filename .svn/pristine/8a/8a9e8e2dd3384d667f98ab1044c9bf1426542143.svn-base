@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.paic.pawj.basic.comment.dao.CommentMapper">
+	<!--添加pawj_basic_user_info一条记录  -->
+	<insert id="saveComment" parameterType="com.paic.pawj.basic.comment.dao.Comment"
+	        useGeneratedKeys="true" keyProperty="commentId">
+		insert into pawj_basic_comments (investigation_id,comment_type, status,comment,publisher,create_time,count) 
+		VALUES (#{investigationId},#{commentType},#{status},#{comment},#{publisher},#{createTime},1)
+	</insert>
+	
+	<select id="getSameComment" parameterType="com.paic.pawj.basic.comment.dao.Comment"
+	        resultType="com.paic.pawj.basic.comment.dao.Comment">
+		SELECT investigation_id investigationId,comment_id commentId,comment_type commentType,status,
+		       comment,publisher,count,create_time createTime
+		FROM pawj_basic_comments p
+        where p.comment = #{comment}
+         and p.status = '1'
+        limit 1 
+	</select>
+	
+	<!-- comment状态加1 -->
+	<update id="updateCommentCount" parameterType="int">
+		update pawj_basic_comments p 
+		set count = count + 1 
+		where p.comment_id = #{commentId}
+	</update>
+	
+</mapper>

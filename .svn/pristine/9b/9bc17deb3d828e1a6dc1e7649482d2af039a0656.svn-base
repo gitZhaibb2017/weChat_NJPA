@@ -1,0 +1,21 @@
+package com.paic.pawj.answer.vo;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * 支持多选使用
+ *
+ */
+@Data
+@NoArgsConstructor
+public class MutilateOption implements java.io.Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3326232895796210596L;
+	
+	private String optionId;
+	private String optionColumnId;
+	private String scoreValue;
+}

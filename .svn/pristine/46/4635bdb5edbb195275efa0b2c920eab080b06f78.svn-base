@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.paic.pawj.investigationVue.dao.IvtgBaseFormVueMapper">
+	<insert id="saveIvtgBaseFormVue" parameterType="com.paic.pawj.investigationVue.dao.IvtgBaseFormVue">
+		INSERT INTO
+		`pawj`.`pawj_busi_investigation` (`investigation_id`, `name`,
+		`user_id`, `question_num`, `coefficient`, `plan_copy`, `return_copy`,
+		`total_fee`, `actual_fee`, `deduct_fee`, `plan_start_time`,
+		`plan_end_time`, `status`, `actual_start_time`, `actual_end_time`,
+		`answer_fee`, `brief`, `label`) VALUES (#{investigationId}, #{name}, #{publisher},
+		#{questionNum}, #{ss}, #{planCopy}, #{returnCopy},
+		#{totalFee}, #{actualFee},#{deductFee},
+		#{planStartTime},#{planEndTime}, #{state}, #{actualStartTime},
+		#{actualEndTime}, #{answerFee}, #{desc},#{label});
+	</insert>
+	
+	<insert id="saveQuestionsDataVue" parameterType="com.paic.pawj.investigationVue.dao.QuestionsDataVueDto">
+		INSERT INTO `pawj_ivtg_question` (`question_id`, `investigation_id`, `subject`, `question_type`, `display_order`, `create_time`, `update_time`, `seq`) VALUES 
+		(#{questionsId}, #{investigationId}, #{ques}, #{optionType},#{displayOrder},
+		#{createTime}, #{updateTime}, #{seq});
+	</insert>
+	<insert id="saveOptionItem" parameterType="java.util.List">
+		INSERT INTO `pawj_ivtg_question_option` (`option_id`, `question_id`, `option_code`, `option_desc`, `option_name`, `display_order`, `path`) VALUES 
+		<foreach collection="list" item="item" index="index" separator="," > 
+			(#{item.optionId}, #{item.questionsId}, #{item.optionCode}, #{item.optionDesc}, #{item.value}, #{item.displayOrder} ,#{item.path})
+		</foreach>
+	</insert>
+	<insert id="saveOptionItemColumn" parameterType="java.util.List">
+		INSERT INTO `pawj_ivtg_option_matrix` (`matrix_id`, `question_id`, `column_code`, `column_desc`, `column_name`, `display_order`) VALUES 
+		<foreach collection="list" item="item" index="index" separator="," > 
+			(#{item.matrixId}, #{item.questionsId}, #{item.columnCode}, #{item.columnDesc}, #{item.value}, #{item.displayOrder})
+		</foreach>
+	</insert>
+	
+	<!-- 根据问卷id获取问卷信息 -->
+	<select id="getInvestigationById" parameterType="String"
+		resultType="com.paic.pawj.investigationVue.dao.IvtgBaseFormVue">
+		select pbi.investigation_id investigationId ,
+		pbi.actual_end_time actualEndTime,
+		pbi.actual_fee actualFee,
+		pbi.actual_start_time actualStartTime,
+		pbi.answer_fee answerFee,
+		pbi.brief 'desc',
+		pbi.coefficient coefficient,
+		pbi.deduct_fee deductFee,
+		pbi.label,
+		pbi.name name,
+		pbi.plan_copy planCopy,
+		pbi.plan_end_time
+		planEndTime,
+		pbi.plan_start_time planStarTime,
+		pbi.question_num
+		questionNum,
+		pbi.return_copy returnCopy,
+		pbi.status status,
+		pbi.total_fee totalFee,
+		pbi.user_id publisher
+		from pawj_busi_investigation
+		pbi
+		where pbi.investigation_id=#{investigationId}
+	</select>
+	
+	
+	
+	<!-- 根据问卷id获取问卷问题列表信息 -->
+	<select id="getQuestionListById" parameterType="String"
+		resultType="com.paic.pawj.investigationVue.dao.QuestionsDataVue">
+		 SELECT
+		    piq.investigation_id  investigationId,
+			piq.question_id questionsId,
+			piq.display_order displayOrder,
+			piq.question_type questionType,
+			piq.seq,
+			'true' isCreate,
+			piq.SUBJECT ques,
+			(
+				SELECT
+					pbdd.dic_desc
+				FROM
+					pawj_basic_dictionary_detail pbdd
+				WHERE
+					pbdd.dic_id = '004'
+				AND pbdd.dic_value = piq.question_type
+			) type,
+			piq.question_type optionType
+		FROM
+			pawj_ivtg_question piq
+		WHERE 
+		piq.investigation_id=#{investigationId}
+		order by piq.seq
+	</select>
+	
+	<!-- 根据问题id获取问题选项信息 -->
+	<select id="getQuestionOptionListById" parameterType="String"
+		resultType="com.paic.pawj.investigationVue.dao.OptionItem">
+		SELECT
+		    piqo.question_id questionsId,
+			piqo.associated_id associatedId,
+			piqo.option_code optionCode,
+			piqo.option_desc optionDesc,
+			piqo.option_id optionId,
+			piqo.option_name value,
+			piqo.path
+		FROM
+		 pawj_ivtg_question_option piqo
+		WHERE 
+		piqo.question_id=#{questionsId}
+	</select>
+    
+    <!-- 根据问题id获取问题选项列集合信息 -->
+	<select id="getOptionMatrixListById" parameterType="String"
+		resultType="com.paic.pawj.investigationVue.dao.OptionColumnItem">
+		 SELECT
+			piom.column_code columnCode,
+			piom.column_desc columnDesc,
+			piom.column_name value,
+			piom.matrix_id matrixId
+		FROM
+		  pawj_ivtg_option_matrix piom 
+		WHERE 
+		  piom.question_id=#{questionsId}
+	</select>
+</mapper>

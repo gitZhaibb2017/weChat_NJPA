@@ -1,0 +1,11 @@
+var slider = $('#slider');
+        slider.find(".slide-trigger").find("li").eq(0).addClass("cur");
+        window.mySwipe = new Swipe(document.getElementById('slider'), {
+            speed: 400,
+            auto: 3000,
+            callback: function(index, elem) {
+                slider.find(".slide-trigger").find("li").eq(index).addClass("cur").siblings().removeClass("cur");
+            }
+        });
+        
+        

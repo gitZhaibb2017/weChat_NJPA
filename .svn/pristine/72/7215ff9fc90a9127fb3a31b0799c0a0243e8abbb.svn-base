@@ -1,0 +1,448 @@
+package com.paic.pawj.home.controller;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+   
+import com.google.gson.Gson;
+import com.paic.pawj.answer.service.AnswersService;
+import com.paic.pawj.basic.interceptor.SessionUserInfo;
+import com.paic.pawj.common.dao.DictionaryDetailDAO;
+import com.paic.pawj.common.service.CommonService;
+import com.paic.pawj.common.util.ContextUtil;
+import com.paic.pawj.home.dao.HpReportDAO;
+import com.paic.pawj.home.dao.HpRollingDAO;
+import com.paic.pawj.home.dao.HpTopicalDAO;
+import com.paic.pawj.home.service.HomeService;
+
+@Controller
+public class HomeController {
+
+	@Autowired
+	private HomeService homeService;
+	@Autowired
+	private CommonService commonService;
+	@Autowired
+	private AnswersService answersService;
+
+	private static int CONTINUOUSDATECOUNT = 7;
+
+	/**
+	 * 取得广告信息
+	 * 
+	 * @param startTime
+	 * @param endTime
+	 * @return
+	 */
+	// http://localhost:8080/pawj/getHomeAd.do?startTime=2016-11-28%2001:01:01&endTime=2016-11-30%2001:01:01
+	@RequestMapping("getHomeAd.do")
+	@ResponseBody
+	public String getHomeAd() {
+		String resultStr = "";
+		try {
+			Map<String, Object> retMap = new HashMap<String, Object>();
+			Map<String, String> paramMap = new HashMap<String, String>();
+			SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(new Date());
+			calendar.set(Calendar.HOUR_OF_DAY, 0);
+			calendar.set(Calendar.MINUTE, 0);
+			calendar.set(Calendar.SECOND, 0);
+
+			paramMap.put("startTime", ft.format(calendar.getTime()));
+			calendar.add(Calendar.DAY_OF_MONTH, 1);
+			paramMap.put("endTime", ft.format(calendar.getTime()));
+
+			// 广告list
+			List<HpRollingDAO> retList = homeService.getHomeAd(paramMap);
+			// 图片服务器地址
+			String picServer = "";
+			picServer = ContextUtil.getPicServer() + "/ad";
+			retMap.put("homeAdList", retList);
+			retMap.put("picServer", picServer);
+			Gson gson = new Gson();
+			resultStr = gson.toJson(retMap).toString();
+		} catch (Exception e) {
+			e.printStackTrace();
+			resultStr = "";
+		}
+
+		return resultStr;
+	}
+
+	/**
+	 * 取得微报告信息
+	 * 
+	 * @return
+	 */
+	@RequestMapping("getHomeReport.do")
+	@ResponseBody
+	public Map<String, String> getHomeReport() {
+		Map<String, String> retMap = new HashMap<String, String>();
+		try {
+			HpReportDAO hpReportDAO = homeService.getHomeReport();
+			retMap.put("reportContent", hpReportDAO.getReportContent());
+			retMap.put("reportName", hpReportDAO.getReportName());
+			retMap.put("reportId", hpReportDAO.getReportId());
+			retMap.put("status", "0");
+		} catch (Exception e) {
+			e.printStackTrace();
+			retMap.put("status", "1");
+		}
+		return retMap;
+	}
+
+	/**
+	 * 取得热门问卷信息
+	 * 
+	 * @return
+	 */
+	@RequestMapping("getHpTopical.do")
+	@ResponseBody
+	public String getHpTopical(HttpSession session) {
+		Map<String, Object> retMap = new HashMap<String, Object>();
+		List<HpTopicalDAO> retList = null;
+		try {
+			String userId = "";
+			if (null != session.getAttribute(SessionUserInfo.SESSION_ID)) {
+				SessionUserInfo userInfo = (SessionUserInfo) session
+						.getAttribute(SessionUserInfo.SESSION_ID);
+				userId = userInfo.getUserId();
+			}else {
+				retMap.put("retCode", "1000");
+				retMap.put("errorMsg", "取得用户信息失败！");
+				Gson gson = new Gson();
+				return gson.toJson(retMap).toString();
+			}
+			retList = homeService.getHpTopical(userId);
+			retMap.put("status", "0");
+			retMap.put("retList", retList);
+			 //答题进度
+			 for (HpTopicalDAO hpTopicalDAO : retList) {
+			 hpTopicalDAO.setQsrComPer(answersService
+			 .getQsrCompletionPercent(hpTopicalDAO.getQsrId()));
+			 }
+			 //Map<String, Object> retMap = new HashMap<String, Object>();
+			 retMap.put("report", retList);
+		} catch (Exception e) {
+			e.printStackTrace();
+			retMap.put("status", "1");
+			retMap.put("retList", null);
+		}
+		Gson gson = new Gson();
+		String resultStr = gson.toJson(retMap).toString();
+		return resultStr;
+	}
+
+	/**
+	 * 取得是否签到
+	 * 
+	 * @param userId
+	 * @param date
+	 * @return 0:未签到,1:已签到
+	 */
+	// http://localhost:8080/pawj/getCheckInStatus.do?userId=1&date=2016-11-28
+	@RequestMapping("getCheckInStatus.do")
+	@ResponseBody
+	public Map<String, String> getCheckInStatus(HttpSession session) {
+		Map<String, String> map = new HashMap<String, String>();
+		int checkInStatus = 1;// 签到
+		try {
+			String userId = "";
+			if (null != session.getAttribute(SessionUserInfo.SESSION_ID)) {
+				SessionUserInfo userInfo = (SessionUserInfo) session
+						.getAttribute(SessionUserInfo.SESSION_ID);
+				userId = userInfo.getUserId();
+			}else {
+				map.put("retCode", "1000");
+				map.put("errorMsg", "取得用户信息失败！");
+				return map;
+			}
+			Map<String, Object> paramMap = new HashMap<String, Object>();
+			Date date = new Date();
+			SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+			String today = sf.format(date);
+			paramMap.put("userId", userId);
+			paramMap.put("checkInDate", today);
+			int ret = homeService.getCheckInStatus(paramMap);
+			if (ret == 0) {// 未签到
+				checkInStatus = 0;
+			}
+			map.put("checkInStatus", checkInStatus + "");
+			map.put("retCode", "0000");
+		} catch (Exception e) {
+			e.printStackTrace();
+			map.put("retCode", "1000");
+		}
+		return map;
+	}
+
+	/**
+	 * 签到更新积分
+	 * 
+	 * @param userId
+	 * @param date
+	 * @param accountId
+	 * @return 签到积分
+	 */
+	// http://localhost:8080/pawj/updateCheckInStatus.do?userId=1&date=2016-11-28&accountId=1
+	@RequestMapping("updateCheckInStatus.do")
+	@ResponseBody
+	public String updateCheckInStatus(HttpSession session) {
+		Map<String, String> retMap = new HashMap<String, String>();
+		try {
+			String userId = "";
+			if (null != session.getAttribute(SessionUserInfo.SESSION_ID)) {
+				SessionUserInfo userInfo = (SessionUserInfo) session
+						.getAttribute(SessionUserInfo.SESSION_ID);
+				userId = userInfo.getUserId();
+			} else {
+				retMap.put("retCode", "1000");
+				retMap.put("errorMsg", "取得用户信息失败！");
+				Gson gson = new Gson();
+				return gson.toJson(retMap).toString();
+			}
+			// 取得连续签到天数
+			Date date = new Date();
+			SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+			String today = sf.format(date);
+			Map<String, Object> paramMap = new HashMap<String, Object>();
+			paramMap.put("userId", userId);
+			paramMap.put("endDate", today);
+
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(date);
+			cal.set(Calendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH)
+					- CONTINUOUSDATECOUNT);
+			paramMap.put("startDate", sf.format(cal.getTime()));
+			List<String> listDate = homeService.getContinuousCIDate(paramMap);
+			cal.setTime(date);
+			cal.set(Calendar.HOUR_OF_DAY, 0);
+			cal.set(Calendar.MINUTE, 0);
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MILLISECOND, 0);
+			Map<String, Object> map = calCheckInDate(listDate, cal.getTime());
+			int count = (int) map.get("count");
+			boolean todayFlg = (boolean) map.get("todayFlg");
+			// 取得签到基础积分
+			String pointStr = "0";
+			List<DictionaryDetailDAO> dicDetial = commonService
+					.getDictionaryDetial("CHECKINPOINT");
+			if (null != dicDetial && dicDetial.size() == 1) {
+				pointStr = dicDetial.get(0).getDicValue();
+			}
+			int point = (int) (Integer.parseInt(pointStr) + (Integer
+					.parseInt(pointStr) * (count) * 0.05));
+
+			paramMap.put("point", point);
+			paramMap.put("date", today);
+			paramMap.put("source", "签到积分");
+			paramMap.put("sourceId", "1");
+			boolean ret = homeService.insertCheckInData(paramMap);
+			if (ret) {
+				ret = homeService.updateCheckInPoint(paramMap);
+				if (ret) {
+					retMap.put("point", point + "");
+					retMap.put("retCode", "0000");
+					retMap.put("count", (count + 1) + "");
+
+				} else {
+					paramMap.put("point", "-" + point);
+					paramMap.put("source", "签到失败");
+					ret = homeService.insertCheckInData(paramMap);
+					if (ret) {
+						retMap.put("errorMsg", "更新积分失败！");
+					} else {
+						retMap.put("errorMsg", "插入积分失败！");
+					}
+					retMap.put("retCode", "1000");
+				}
+			} else {
+				retMap.put("retCode", "1000");
+				retMap.put("errorMsg", "插入积分失败！");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			retMap.put("retCode", "1000");
+			retMap.put("errorMsg", "签到失败！");
+			Gson gson = new Gson();
+			return gson.toJson(retMap).toString();
+		}
+		Gson gson = new Gson();
+		return gson.toJson(retMap).toString();
+	}
+
+	/**
+	 * 取得用户头像
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	@RequestMapping("getUserIcon.do")
+	@ResponseBody
+	public Map<String, String> getUserIcon(HttpSession session) {
+		String picServer = "";
+		Map<String, String> retMap = new HashMap<String, String>();
+		try {
+			String userId = "";
+			if (null != session.getAttribute(SessionUserInfo.SESSION_ID)) {
+				SessionUserInfo userInfo = (SessionUserInfo) session
+						.getAttribute(SessionUserInfo.SESSION_ID);
+				userId = userInfo.getUserId();
+			} else {
+				retMap.put("retCode", "1000");
+				retMap.put("errorMsg", "取得用户信息失败！");
+				return retMap;
+			}
+			String picName = homeService.getUserIcon(userId);
+			// 图片服务器地址
+			picServer = ContextUtil.getPicServer() + "/tx/";
+			if (picName != null) {
+				picServer = picServer + picName;
+			} else {
+				picServer = picServer + "def_user_icon.png";
+			}
+			retMap.put("retCode", "0000");
+			retMap.put("picServer", picServer);
+		} catch (Exception e) {
+			e.printStackTrace();
+			retMap.put("retCode", "1000");
+		}
+		return retMap;
+	}
+
+	/**
+	 * 取得连续签到天数和积分
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	@RequestMapping("getCheckInPoint.do")
+	@ResponseBody
+	public Map<String, String> getCheckInPoint(HttpSession session) {
+		// 取得连续签到天数
+		Map<String, String> retMap = new HashMap<String, String>();
+		String userId = "";
+		try {
+			if (null != session.getAttribute(SessionUserInfo.SESSION_ID)) {
+				SessionUserInfo userInfo = (SessionUserInfo) session
+						.getAttribute(SessionUserInfo.SESSION_ID);
+				userId = userInfo.getUserId();
+			} else {
+				retMap.put("retCode", "1000");
+				retMap.put("errorMsg", "取得用户信息失败！");
+				return retMap;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			retMap.put("retCode", "1000");
+		}
+		Date date = new Date();
+		SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+		String today = sf.format(date);
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("userId", userId);
+		paramMap.put("endDate", today);
+		try {
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(new Date());
+			cal.set(Calendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH)
+					- CONTINUOUSDATECOUNT);
+			paramMap.put("startDate", sf.format(cal.getTime()));
+			List<String> listDate = homeService.getContinuousCIDate(paramMap);
+			cal.setTime(date);
+			cal.set(Calendar.HOUR_OF_DAY, 0);
+			cal.set(Calendar.MINUTE, 0);
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MILLISECOND, 0);
+			Map<String, Object> map = calCheckInDate(listDate, cal.getTime());
+			int count = (int) map.get("count");
+			boolean todayFlg = (boolean) map.get("todayFlg");
+			// 取得签到基础积分
+			String pointStr = "0";
+			List<DictionaryDetailDAO> dicDetial = commonService
+					.getDictionaryDetial("CHECKINPOINT");
+			if (null != dicDetial && dicDetial.size() == 1) {
+				pointStr = dicDetial.get(0).getDicValue();
+			}
+			int point = 0;
+			if (todayFlg) {
+				point = (int) (Integer.parseInt(pointStr) + (Integer
+						.parseInt(pointStr) * (count - 1) * 0.05));
+			} else {
+				point = (int) (Integer.parseInt(pointStr) + (Integer
+						.parseInt(pointStr) * (count) * 0.05));
+			}
+			retMap.put("retCode", "0000");
+			retMap.put("point", point + "");
+			retMap.put("count", count + "");
+			retMap.put("todayFlg", todayFlg + "");
+		} catch (Exception e) {
+			e.printStackTrace();
+			retMap.put("retCode", "1000");
+		}
+
+		return retMap;
+	}
+
+	/**
+	 * @param listDate
+	 * @param newdate
+	 * @return 连续签到天数
+	 */
+	private Map<String, Object> calCheckInDate(List<String> listDate,
+			Date newdate) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		int count = 0;
+		boolean todayFlg = false;
+		int size = 0;
+		long l1, l2;
+		if (listDate == null || listDate.size() == 0) {
+			count = 0;
+			map.put("count", count);
+			map.put("todayFlg", todayFlg);
+			return map;
+		}
+		SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			// 今天还未签到
+			if (!sf.format(newdate).equals(listDate.get(0))) {
+				l1 = newdate.getTime();
+				l2 = sf.parse(listDate.get(0)).getTime();
+				if (l1 - l2 != 1000 * 60 * 60 * 24) {
+					count = 0;
+				}
+			} else {
+				count++;
+				todayFlg = true;
+			}
+			while (size + 1 < listDate.size() && count < CONTINUOUSDATECOUNT) {
+
+				l1 = sf.parse(listDate.get(size)).getTime();
+				l2 = sf.parse(listDate.get(size + 1)).getTime();
+				if (l1 - l2 == 1000 * 60 * 60 * 24) {
+					count++;
+					size = size + 1;
+				} else {
+					break;
+				}
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		map.put("count", count);
+		map.put("todayFlg", todayFlg);
+		return map;
+	}
+}

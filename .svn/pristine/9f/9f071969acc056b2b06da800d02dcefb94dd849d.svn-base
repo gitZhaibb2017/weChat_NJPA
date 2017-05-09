@@ -1,0 +1,21 @@
+package com.paic.pawj.answer.dto;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+
+@NoArgsConstructor
+@Data
+public class AnswerQuestion implements java.io.Serializable {/**
+	 * 
+	 */
+	private static final long serialVersionUID = -9098230962653093730L;
+	
+	private String id;
+	private String investigationId;
+	private String questionId;
+	private int answerSeq;
+	private String createdTime;
+	private String userId;
+
+}

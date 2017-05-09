@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.paic.pawj.basic.user.dao.UserMapper">
+	<!-- namespace的值 指向所映射的 dao -->
+	<resultMap id="userInfo" type="com.paic.pawj.basic.user.dto.UserInfo">
+		<id column="user_id" property="userId" />
+		<result column="picture_path" property="picturePath" />
+		<result column="name" property="name" />
+		<result column="nick_name" property="nickName" />
+		<result column="sex" property="sex" />
+		<result column="profession" property="profession" />
+		<result column="status" property="status" />
+		<result column="mobile" property="mobile" />
+		<result column="email" property="email" />
+		<result column="grade" property="grade" />
+		<result column="user_name" property="userName" />
+		<result column="pwd" property="pwd" />
+		<result column="point" property="score" />
+		<result column="balance" property="balance" />
+		<result column="card_no" property="cardNo" />
+		<result column="card_status" property="cardStatus" />
+		<result column="rownum" property="level" />
+		<result column="grade_name" property="gradeName" />
+	</resultMap>
+
+	<parameterMap type="com.paic.pawj.basic.user.dto.UserInfo"
+		id="user">
+		<parameter property="userId" resultMap="user_id" />
+		<parameter property="nickName" resultMap="nick_name" />
+		<parameter property="userName" resultMap="user_name" />
+		<parameter property="pwd" resultMap="pwd" />
+		<parameter property="picturePath" resultMap="picture_path" />
+		<parameter property="name" resultMap="name" />
+		<parameter property="profession" resultMap="profession" />
+		<parameter property="userId" resultMap="user_id" />
+		<parameter property="mobile" resultMap="mobile" />
+		<parameter property="email" resultMap="email" />
+		<parameter property="sex" resultMap="sex" />
+	</parameterMap>
+
+	<!--查询用户信息 -->
+	<select id="queryUserInfo" resultMap="userInfo" parameterMap="user">
+		select t.picture_path,t.name,t .nick_name,
+		t.sex,t.profession,t.card_no,t.card_status,p.user_id,p.user_name,
+		p.mobile,p.email,c.point from pawj_basic_user_info t ,
+		(select
+		p.user_id,p.user_name,p.mobile,p.email from pawj_basic_user
+		p where
+		p.user_id = #{userId} and p.pwd = #{pwd}) p,
+		account_account c
+		where
+		t.user_id = p.user_id and t.user_id = c.user_id
+	</select>
+
+	<!--修改用户信息表 -->
+	<update id="updateUserInfo" parameterMap="user">
+		update
+		pawj_basic_user_info t
+		set
+		t.name = #{name},
+		t.nick_name = #{nickName},
+		t.sex = #{sex},
+		t.profession =
+		#{profession}
+		where t.user_id = #{userId};
+	</update>
+
+	<!--修改注册用户表 -->
+	<update id="updateUser" parameterMap="user">
+		update pawj_basic_user p
+		set
+		p.mobile = #{mobile},
+		p.email = #{email} where p.user_id = #{userId}
+	</update>
+
+	<!--查询用户所有个人信息 -->
+	<select id="queryAllUserInfo" resultMap="userInfo" parameterMap="user">
+		SELECT
+		a.user_id,
+		a.user_name,
+		a.mobile,
+		a.email,
+		b.picture_path,
+		b.grade,
+		b. name,
+		b.nick_name,
+		b.sex,
+		b.profession,
+		c.balance,
+		c.point,
+		c.rownum,
+		d.grade_name
+		FROM
+		pawj_basic_user_info b
+		LEFT JOIN pawj_basic_user a ON
+		b.user_id = a.user_id
+		LEFT JOIN (
+		SELECT
+		@rownum :=@rownum + 1 AS rownum,
+		user_id,
+		balance,
+		point
+		FROM
+		account_account,
+		(SELECT @rownum := 0) r
+		ORDER
+		BY
+		balance DESC
+		) c ON b.user_id = c.user_id
+		LEFT JOIN basic_grade_define
+		d ON b.grade = d.grade
+		WHERE
+		b.user_id = #{userId}
+	</select>
+
+	<!-- 查询财富排序 -->
+	<select id="queryTreasure" resultMap="userInfo" parameterMap="user">
+		SELECT
+		a.picture_path,
+		c.balance,
+		c.rownum,
+		c.user_id,
+		a.nick_name
+		FROM
+		pawj_basic_user_info a,
+		pawj_basic_user b ,
+		(
+		SELECT
+		@rownum :=@rownum + 1
+		AS rownum,
+		user_id,
+		balance,
+		point
+		FROM
+		account_account,
+		(SELECT @rownum :=
+		0) r
+		ORDER BY
+		balance desc
+		) c
+		WHERE
+		a.user_id = b.user_id
+		and
+		a.user_id =
+		c.user_id
+		limit #{start},#{pageSize}
+	</select>
+
+	<!--查询个人财富排名 -->
+	<select id="queryPersonTreasure" resultMap="userInfo"
+		parameterMap="user">
+		SELECT
+		a.picture_path,
+		c.balance,
+		c.rownum,
+		c.user_id,
+		a.nick_name
+		FROM
+		pawj_basic_user_info a,
+		(select b.user_id from
+		pawj_basic_user b where b.user_id = #{userId} ) b,
+		(
+		SELECT
+		@rownum
+		:=@rownum + 1 AS rownum,
+		user_id,
+		balance,
+		point
+		FROM
+		account_account,
+		(SELECT @rownum := 0) r
+		ORDER BY
+		balance desc
+		) c
+		WHERE
+		a.user_id =
+		b.user_id and
+		b.user_id = c.user_id
+	</select>
+
+	<!-- 查询分数 -->
+	<select id="queryPoint" resultType="java.util.HashMap"
+		parameterMap="user">
+		SELECT
+		if (STRCMP(b.source,'ivtg_add'),b.source,'参与调查') source,
+		b.point_change pointChange,
+		DATE_FORMAT(
+		b.change_time,
+		'%Y-%m-%d')
+		changeTime
+		FROM
+		account_account a,
+		account_point b,
+		(select
+		t.user_id from pawj_basic_user t
+		WHERE t.user_id
+		= #{userId}) c
+		WHERE
+		a.user_id = b.user_id and
+		a.user_id = c.user_id and
+		b.user_id = c.user_id
+		ORDER BY
+		b.change_time DESC
+	</select>
+
+	<!--查询余额明细 -->
+	<select id="queryBalanceDetail" resultType="java.util.HashMap"
+		parameterMap="user">
+		SELECT
+		if (STRCMP(a.source,'ivtg_add'),a.source,'收益') source,
+		DATE_FORMAT(
+		a.do_time,
+		'%Y-%m-%d')
+		doTime,
+		a.balance balance,
+		a.sum sum
+		FROM
+		account_balance_detail a,
+		(
+		SELECT
+		b.user_id
+		FROM
+		pawj_basic_user b
+		WHERE
+		b.user_id = #{userId}
+		) b
+		WHERE
+		a.user_id = b.user_id order by a.do_time desc
+		<!-- limit #{start},#{pageSize}; -->
+	</select>
+
+	<!-- 查询答题记录 -->
+	<select id="queryAnswer" resultType="java.util.HashMap"
+		parameterMap="user">
+		SELECT
+		b.`name` name,
+		b.answer_status status,
+		DATE_FORMAT(
+		b.commit_time,
+		'%Y-%m-%d'
+		) actualEndTime,
+		b.answer_fee answerFee
+		FROM
+		(
+		SELECT
+		a.user_id
+		FROM
+		pawj_basic_user a
+		WHERE
+		a.user_id = #{userId}
+		) a,
+		(SELECT
+		b.`name` ,
+		r.user_id ,
+		r.answer_status,
+		r.commit_time,
+		b.answer_fee
+		FROM
+		pawj_busi_investigation b
+		LEFT JOIN
+		pawj_sur_answers_record r
+		ON b.investigation_id = r.investigation_id) b
+		WHERE
+		a.user_id = b.user_id
+		order by b.commit_time desc
+	</select>
+
+	<!--我的调查查询 -->
+	<select id="queryMySurvey" resultType="java.util.HashMap"
+		parameterMap="user">
+		SELECT
+		b.`name` name,
+		b.coefficient coefficient,
+		b.plan_copy planCopy,
+		b.return_copy returnCopy
+		FROM
+		(
+		SELECT
+		a.user_id
+		FROM
+		pawj_basic_user a
+		WHERE
+		a.user_id = #{userId}
+		) a,
+		pawj_busi_investigation b
+		WHERE
+		a.user_id = b.user_id
+	</select>
+
+	<!--共享调查 -->
+	<select id="queryShare" resultType="java.util.HashMap">
+		SELECT
+		b.`name` name,
+		b.coefficient coefficient
+		FROM
+		pawj_busi_investigation b
+	</select>
+
+	<!--修改姓名 -->
+	<update id="updateName" parameterMap="user">
+		<!-- update pawj_basic_user_info t set t.name = #{name} where t.user_id 
+			= #{userId} -->
+		update pawj_basic_user_info t
+		set t.name = #{name}
+		where t.user_id =
+		#{userId}
+	</update>
+
+	<!--修改昵称 -->
+	<update id="updateNickName" parameterMap="user">
+		update
+		pawj_basic_user_info t
+		set
+		t.nick_name = #{nickName}
+		where t.user_id =
+		#{userId}
+	</update>
+
+	<!--查询姓名是否存在 -->
+	<select id="queryName" resultType="int" parameterType="String">
+		SELECT
+		COUNT(1)
+		FROM
+		pawj_basic_user_info t
+		WHERE
+		t.`name` = #{name}
+	</select>
+
+	<!--查询用户昵称是否存在 -->
+	<select id="queryNickName" resultType="int" parameterType="String">
+		SELECT
+		COUNT(1)
+		FROM
+		pawj_basic_user_info t
+		WHERE
+		t.nick_name = #{nickName}
+	</select>
+
+	<!--根据userId修改密码 -->
+	<update id="updatePwd" parameterMap="user">
+		update pawj_basic_user t
+		set
+		t.pwd = #{pwd}
+		where t.user_id = #{userId}
+	</update>
+
+	<!--根据userId查询原密码 -->
+	<select id="queryPwd" parameterType="String" resultType="String">
+		SELECT
+		t.pwd pwd
+		FROM
+		pawj_basic_user t
+		WHERE
+		t.user_id = #{userId};
+	</select>
+
+	<!--修改性别 -->
+	<update id="updateSex" parameterMap="user">
+		update pawj_basic_user_info
+		t
+		set
+		t.sex = #{sex}
+		where t.user_id = #{userId}
+	</update>
+
+	<!--修改职业 -->
+	<update id="updateProfession" parameterMap="user">
+		update
+		pawj_basic_user_info t
+		set
+		t.profession = #{profession}
+		where t.user_id =
+		#{userId}
+	</update>
+
+	<!--修改手机 -->
+	<update id="updateMobile" parameterMap="user">
+		update pawj_basic_user t
+		set t.mobile = #{mobile}
+		where t.user_id = #{userId}
+	</update>
+
+	<!--修改eamil -->
+	<update id="updateEmail" parameterMap="user">
+		update pawj_basic_user t
+		set t.email = #{email}
+		where t.user_id = #{userId}
+
+	</update>
+
+	<!--查询userId -->
+	<select id="queryUserId" resultType="int" parameterType="String">
+		SELECT
+		count(1)
+		FROM
+		pawj_basic_user_info t
+		WHERE
+		t.user_id = #{userId}
+
+	</select>
+
+	<!--添加pawj_basic_user_info一条记录 -->
+	<insert id="addUserInfo" parameterType="String">
+		insert into
+		pawj_basic_user_info (user_id) VALUES (#{userId})
+
+	</insert>
+
+	<!--修改图片路径 -->
+	<update id="updatePicturePath" parameterType="com.paic.pawj.basic.user.dto.UserInfo">
+		UPDATE
+		pawj_basic_user_info t
+		SET t.picture_path = #{picturePath}
+		WHERE
+		t.user_id = #{userId}
+	</update>
+	<!-- 查询用户个人等级排名 -->
+	<select id="queryPersonalGrade" resultMap="userInfo"
+		parameterMap="user">
+		SELECT
+		*
+		FROM
+		(
+		SELECT
+		@rownum :=@rownum + 1 AS rownum,
+		u.nick_name,
+		u.grade,
+		u.picture_path,
+		u.user_id
+		FROM
+		pawj_basic_user_info
+		u,
+		(SELECT @rownum := 0) r
+		ORDER BY
+		grade DESC
+		) c
+		WHERE
+		user_id =#{userId}
+	</select>
+	<!-- 查询所有用户等级排名 -->
+	<select id="queryAllGrade" resultMap="userInfo" parameterMap="user">
+		SELECT
+		*
+		FROM
+		(
+		SELECT
+		@rownum :=@rownum + 1 AS rownum,
+		u.nick_name,
+		u.grade,
+		u.picture_path,
+		u.user_id
+		FROM
+		pawj_basic_user_info u,
+		(SELECT @rownum := 0) r
+		ORDER BY
+		grade DESC
+		) c
+		LIMIT #{start},#{pageSize}
+
+	</select>
+	<!-- 修改用户信息-单值修改 -->
+	<update id="updateUserByParamKey" parameterType="map">
+		update
+			pawj_basic_user t
+		set
+			t.user_id = t.user_Id
+		<if test="paramKey != null">
+			,
+			${paramKey} = #{paramValue}
+		</if>
+		where t.user_id = #{userId}
+	</update>
+	
+	<!-- 修改用户信息-单值修改 -->
+	<update id="updateUserInfoByParamKey" parameterType="map">
+		update
+			pawj_basic_user_info t
+		set
+			t.user_id = t.user_Id
+		<if test="paramKey != null">
+			,
+			${paramKey} = #{paramValue}
+		</if>
+		where t.user_id = #{userId}
+	</update>
+</mapper>

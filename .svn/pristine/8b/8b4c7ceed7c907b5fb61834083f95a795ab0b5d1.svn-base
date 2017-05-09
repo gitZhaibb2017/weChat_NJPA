@@ -1,0 +1,13 @@
+package com.paic.pawj.answer.vo;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@Data
+public class CommentVO {
+	private String commentID;
+	
+	private String comment;
+
+}

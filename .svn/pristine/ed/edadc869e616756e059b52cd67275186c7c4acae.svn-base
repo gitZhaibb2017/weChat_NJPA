@@ -1,0 +1,132 @@
+package com.paic.pawj.auth.common.contants;
+
+
+public class AuthContants {
+
+	/**
+	 * 注册失败
+	 */
+	public static final String REGISTER_FAIL = "2";
+	
+	/**
+	 * 注册成功
+	 */
+	public static final String REGISTER_SUCC = "0";
+	
+	/**
+	 * 用户名可用
+	 */
+	public static final String REGISTER_VALIDATE_SUCC = "0";
+	
+	/**
+	 * 账号已存在
+	 */
+	public static final String USER_ID_EXIST = "1";
+	
+	/**
+	 * 微信已经被注册
+	 */
+	public static final String WECHAT_ID_EXIST = "3";
+	
+	/**
+	 * 手机已经被注册
+	 */
+	public static final String MOBILE_ID_EXIST = "6";
+	
+	/**
+	 * 注册账户格式不符合要求
+	 */
+	public static final String REGISTER_ILLEGAL = "3";
+	
+	/**
+	 * 手机号码格式不正确
+	 */
+	public static final String MOBILE_ILLEGAL = "4";
+	
+	/**
+	 * 注册账户不能为空
+	 */
+	public static final String REGISTER_NULL = "4";
+	
+	/**
+	 * 邀请码不可用
+	 */
+	public static final String INVITE_CODE_ILLEGAL = "0";
+	
+	/**
+	 * 邀请码可用
+	 */
+	public static final String INVITE_CODE_LEGAL = "1";
+	
+	/**
+	 * 计数0
+	 */
+	public static final int CNT_ZERO = 0;
+	
+	/**
+	 * 注册成功4wechat
+	 */
+	public static final String REGISTER4WECHAT_SUCC = "5";
+	
+	/**
+	 * 手机验证模式
+	 */
+	public static final String REGEXP_MOBILE = "^(1[0-9])\\d{9}$";
+	
+	/**
+	 * email验证模式
+	 */
+	public static final String REGEXP_EMAIL = "^\\w+((-\\w+)|(\\.\\w+))*\\@[A-Za-z0-9]+((\\.|-)[A-Za-z0-9]+)*\\.[A-Za-z0-9]+$";
+	
+	/**
+	 * UserName验证模式
+	 */
+	public static final String REGEXP_USERNAME = "^[A-Za-z][A-Za-z0-9_-]+$";
+	
+	/**
+	 * 文件分隔符
+	 */
+	public static final String FILE_SEPARATOR = "/";
+	
+	/**
+	 * 默认密码
+	 */
+	public static final String DEFAULT_PWD = "888888";
+	
+	/**
+	 * 阿里云短息平台常量-官网的URL 
+	 */
+	public static final String URL = "http://gw.api.taobao.com/router/rest";  
+	
+	/**
+	 * 阿里云短息平台常量-成为开发者，创建应用后系统自动生成  
+	 */
+	public static final String APPKEY = "23651744";  
+	
+	/**
+	 * 阿里云短息平台常量-成为开发者，创建应用后系统自动生成  
+	 */
+	public static final String SECRET = "fec5aabe47ed1515fc3799a67765d91b";  
+	
+	public static final String NORMAL = "normal";
+	
+	public static final String TEMPLENT_SMS = "SMS_49340001";
+	
+	public static final String SIGN_NAME = "调查问卷";
+	
+	public static final int MIN = 1;
+	
+	public static final int MAX = 999999;
+	
+	public static final int TIME = 5;
+	
+	public static final String FORMATE_STR = "yyyy-MM-dd HH:mm:ss";
+	
+	// 题目图片保存的文件夹
+	public static final String CHOICE_PIC_PATH = "choicepic";
+	
+	/**
+	 * 下划线
+	 */
+	public static final String  UNDERSCODE = "_";
+}

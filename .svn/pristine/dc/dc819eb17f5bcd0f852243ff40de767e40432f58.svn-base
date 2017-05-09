@@ -1,0 +1,111 @@
+package com.paic.pawj.lottery.controller;
+
+import java.util.List;
+
+import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.paic.pawj.basic.interceptor.SessionUserInfo;
+import com.paic.pawj.lottery.dao.Partner;
+import com.paic.pawj.lottery.service.LotteryService;
+
+@Controller
+@RequestMapping("/app/lottery/")
+public class LotteryController {
+	private static final Logger LOGGER = Logger
+			.getLogger(LotteryController.class);
+	
+	
+	@Autowired
+	LotteryService lotteryService;
+
+	@ResponseBody
+	@RequestMapping("vote.do")
+	public String vote(HttpSession session)
+	{
+		LOGGER.info("[VOTE]step1: " + System.currentTimeMillis());
+		SessionUserInfo userInfo = 
+				(SessionUserInfo)session.getAttribute(SessionUserInfo.SESSION_ID);
+		JsonObject result = lotteryService.vote(userInfo.getUserId());
+		return result.toString();
+	}
+	
+	@ResponseBody
+	@RequestMapping("partners.do")
+	public String partners()
+	{
+		JsonObject result = new JsonObject();
+		Gson gson = new Gson();
+		List<Partner> partners = lotteryService.getAllPartners();
+		result.add("partners", gson.toJsonTree(partners));
+		result.add("prize", gson.toJsonTree(lotteryService.getCurrentPrize()));
+		return result.toString();
+	}
+	
+	@ResponseBody
+	@RequestMapping("startVote.do")
+	public String startVote(@RequestParam String level, @RequestParam  String lowl,
+			String type)
+	{
+		JsonObject result = new JsonObject();
+		if (!"9527".equals(lowl))
+		{
+			result.addProperty("retCode", "9999");
+			return result.toString();
+		}
+		try 
+		{
+			if ("reload".equals(type))
+			{
+				lotteryService.reload();
+			}
+			else
+			{
+				lotteryService.startVote(level);
+			}
+			result.addProperty("retCode", "0000");
+		}
+		catch (Exception e)
+		{
+			result.addProperty("retCode", "9999");
+		}
+		
+		
+		return result.toString();
+	}
+	
+	@ResponseBody
+	@RequestMapping("stopVote.do")
+	public String stopVote(@RequestParam String level, @RequestParam  String lowl)
+	{
+		JsonObject result = new JsonObject();
+		if (!"9527".equals(lowl))
+		{
+			result.addProperty("retCode", "9999");
+			return result.toString();
+		}
+		try 
+		{
+			List<Partner> list = lotteryService.stopVote(level);
+			Gson gson = new Gson();
+			result.addProperty("retCode", "0000");
+			result.add("winners", gson.toJsonTree(list));
+		}
+		catch (Exception e)
+		{
+			LOGGER.error("shibai", e);
+			result.addProperty("retCode", "9999");
+		}
+		
+		
+		return result.toString();
+	}
+}

@@ -1,0 +1,31 @@
+<div class="upload">
+	<div class="u-text">
+		<textarea placeholder="说点什么吧..." ng-model="description"></textarea>
+	</div>
+	<div class="u-time">
+		<span>拍摄时间：</span>
+		<input type="date" value="" ng-model="photoDate">
+	</div>
+	<div class="u-ai">
+		<div class="u-img">
+			<!-- <a ng-repeat="per in localIds"><img ng-src="{{per}}"></a> -->
+			<!-- <wx-img ng-repeat="per in localids"></wx-img> -->
+			<!-- <a ng-repeat="per in localids"><img src="{{per.uri}}"><span class="del" ng-click="delImg($index);">x</span></a> -->
+			<a ng-show="localIds.length < 9" ng-click="addImages();" id="addImages"><img src="wechat/img/add_pic.png"></a>
+		</div>
+	</div> 
+	<font class="u-f">为了方便活动举办方能够第一时间联系您！</font>
+	<div class="u-time u-fi" ng-show="true">
+		<span>用户姓名：</span>
+		<input type="text" placeholder="请输入用户姓名" ng-model="showName">
+	</div>
+	<div class="u-time" ng-show="true">
+		<span>手机号码：</span>
+		<input type="text" placeholder="请输入手机号码" ng-model="phoneNo">
+	</div>
+	
+	<a class="c-btn_01" ng-click="uploadImg();"></a>
+	
+	<div ng-show="msg.isShow" class="cover"></div>
+	<span ng-show="msg.isShow" class="msg" ng-bind="msg.info"></span>
+</div>

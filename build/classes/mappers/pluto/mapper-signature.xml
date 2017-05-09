@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.paic.pluto.wechat.dao.WeChatDao">
+	
+	
+	<delete id="deleteAccessTokenAndTicketByAppId">
+		delete from pluto_wx_base where appid = #{0}
+	</delete>
+
+	<delete id="deleteSignatureByAppId">
+		delete from pluto_wx_jssdk where appid = #{0}
+	</delete>
+	
+	<resultMap type="com.paic.pluto.wechat.pojo.WeChatBase" id="weChatBaseMap">
+		<id column="appid" property="appid"/>
+		<result column="secret" property="secret"/>
+		<result column="accessToken" property="accessToken"/>
+		<result column="jsapiTicket" property="jsapiTicket"/>
+	</resultMap>
+	
+	<select id="getAccessTokenAndTicket" resultMap="weChatBaseMap">
+		SELECT t.appid,t.secret,t.accessToken,t.jsapiTicket
+		FROM pluto_wx_base t 
+		WHERE t.appid = #{0}
+	</select>
+	
+	
+	<insert id="insertAccessTokenAndTicket" parameterType="com.paic.pluto.wechat.pojo.WeChatBase">  
+		insert into pluto_wx_base(appid,secret,accessToken,jsapiTicket)
+		values(#{appid},#{secret},#{accessToken},#{jsapiTicket}) 
+	</insert>
+	
+	<insert id="insertSignature" parameterType="com.paic.pluto.wechat.pojo.Signature">  
+		insert into pluto_wx_jssdk(appid,timestamps,nonceStr,signature,url)
+		values(#{appid},#{timestamps},#{nonceStr},#{signature},#{url}) 
+	</insert>
+	
+	<resultMap type="com.paic.pluto.wechat.pojo.Signature" id="signatureMap">
+		<id column="appid" property="appid"/>
+		<result column="timestamps" property="timestamps"/>
+		<result column="nonceStr" property="nonceStr"/>
+		<result column="signature" property="signature"/>
+		<result column="url" property="url"/>
+	</resultMap>
+	
+	<select id="getSignature" resultMap="signatureMap">
+		SELECT t.appid,t.timestamps,t.nonceStr,t.signature,t.url 
+		FROM pluto_wx_jssdk t 
+		WHERE t.appid = #{0} and t.url = #{1} limit 1
+	</select>
+	
+	<resultMap type="com.paic.pluto.wechat.pojo.Signature" id="urlSignatureMap">
+		<id column="appid" property="appid"/>
+		<result column="url" property="url"/>
+	</resultMap>
+	
+	<select id="queryUrlForSignature" resultMap="urlSignatureMap">
+		SELECT t.appid,t.url
+		FROM pluto_wx_url t 
+		WHERE t.appid = #{0}
+	</select>
+
+</mapper>

@@ -1,0 +1,26 @@
+/**
+ * 
+ */
+package com.paic.pawj.basic.grade.service;
+
+import java.util.Map;
+
+import com.paic.pawj.basic.user.dto.UserInfo;
+
+
+
+public interface GradeService {
+	
+
+	/**
+	 * 获得用户等级
+	 * @param userId
+	 * @return
+	 */
+	public Map<String, Object> getUserGrade(UserInfo fo);
+	
+	/**
+	 * 根据策略升级
+	 */
+	public void setUserGrade(UserInfo fo);
+}

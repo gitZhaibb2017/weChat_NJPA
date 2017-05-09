@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="css/css.css"/>
+	</head>
+	<body>
+		<div class="contain">
+			<div class="gold"></div>
+			<div class="title"></div>
+			<div class="prize first-prize"></div>
+			<div class="prize two-prize"></div>
+			<div class="prize three-prize"></div>
+			<div class="prize four-prize"></div>
+			<div class="prize five-prize1"></div>
+			<div class="prize five-prize2"></div>
+			<a href="javascript:void(0)" class="btn btn-start"></a>
+			<div class="mark"></div>
+			<div class="winner"></div>
+			<div class="winner-list">
+				<h3 id="winner0"></h1>
+				<h3 id="winner1"></h1>
+				<h3 id="winner2"></h1>
+				<h3 id="winner3"></h1>
+				<h3 id="winner4"></h1>
+				<h3 id="winner5"></h1>
+				<h3 id="winner6"></h1>
+				<h3 id="winner7"></h1>
+				<h3 id="winner8"></h1>
+				<h3 id="winner9"></h1>
+				<a href="#" class="btn-close">X</a>
+			</div>
+		</div>
+		<script src="js/jquery-2.1.1.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/newyear.js" type="text/javascript" charset="utf-8"></script>
+	</body>
+</html>

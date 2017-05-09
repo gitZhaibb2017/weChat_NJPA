@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.paic.pawj.partner.dao.LotteryPartnerMapper">
+	<!--查询获奖信息  -->
+	<select id="queryLotteryPartnerList" parameterType="com.paic.pawj.partner.dto.LotteryPartner"
+	    resultType="com.paic.pawj.partner.dto.LotteryPartner">
+	    SELECT
+		t.user_id as userId,
+  		t.user_name as userName,
+		CASE t.`status`
+		WHEN 1 THEN
+		'已中奖'
+		WHEN 2 THEN
+		'无效'
+		WHEN 0 THEN
+		'未中奖'
+		END status,
+		t.path path,
+		t.prize_id prizeId
+		FROM
+		lottery_partner t
+		limit #{start},#{pageSize}
+	</select>
+
+	<!--查询获奖信息总条数  -->
+	<select id="queryLotteryPartnerCount" parameterType="com.paic.pawj.partner.dto.LotteryPartner"
+	    resultType="int">
+	    SELECT
+		count(1)
+		FROM
+		lottery_partner t
+	</select>
+	
+	<!--修改获奖信息  -->
+	<update id="updateLotteryPartner" parameterType="com.paic.pawj.partner.dto.LotteryPartner">
+	    UPDATE lottery_partner t
+		SET 
+		t.user_name = #{userName},
+ 		t.`status` = #{status},
+ 		t.path = #{path}
+		WHERE
+		t.user_id = #{userId}
+	</update>
+	
+	<!--添加获奖信息  -->
+	<insert id="addLotteryPartner" parameterType="com.paic.pawj.partner.dto.LotteryPartner">
+	    INSERT INTO lottery_partner (
+		user_id,
+		user_name,
+		status,
+		path
+		)
+		VALUES
+		(
+		#{userId},
+		#{userName},
+		#{status},
+		#{path}
+		) 
+	</insert>
+	
+	<delete id="deleteLotteryPartner" parameterType="String">
+	    DELETE from lottery_partner  where user_id = #{userId} 
+	    
+	</delete>
+</mapper>

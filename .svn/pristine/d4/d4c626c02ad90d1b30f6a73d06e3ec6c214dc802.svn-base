@@ -1,0 +1,21 @@
+//返回
+function goReChargeBack(){
+	window.history.back();
+};
+//支付下一步
+function goReChargeNext() {
+	//获取金额
+	var money=$('#rechargeMoney').val().trim();
+	var chMoney=parseInt(money);
+	if(!Validator.validateNull(money)
+			&& chMoney < 5000){
+		//发送请求
+		alert("成功了");
+	}else{
+		if(Validator.validateNull(money)){
+			$.popAlert("充值金额不能为空");
+		}else if(chMoney > 5000){
+			$.popAlert("单笔不能超过5000元");
+		}
+	}
+}

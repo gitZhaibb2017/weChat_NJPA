@@ -1,0 +1,16 @@
+package com.paic.pawj.investigationVue.dao;
+
+import java.util.List;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class IvtgFormDTO {
+	//问卷基本信息
+	private IvtgBaseFormVue ivtgBaseForm;
+	//问题类型
+	private List<QuestionsDataVue> questionsData;
+	
+}

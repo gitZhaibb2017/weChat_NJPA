@@ -1,0 +1,216 @@
+/**
+ * 
+ */
+package com.paic.pawj.basic.user.dto;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * Description:UserInfo类
+ * 
+ * @author tudou
+ * @version
+ */
+@Data
+@NoArgsConstructor
+    public class UserInfo {
+    
+	/**
+	 * 用户userId
+	 */
+    private String userId = "";
+    
+    /**
+     * 
+     */
+    private String accountId ;
+    
+    /**
+	 * 用户名称
+	 */
+    private String userName = "";
+    
+    /**
+	 *	全名
+	 */
+    private String name = "";
+    
+    /**
+     * 昵称
+     */
+    private String nickName = "";
+    
+    /**
+	 * qqId
+	 */
+    private String qqId;
+    
+    /**
+	 * wxId
+	 */
+    private String wxId;
+    
+    /**
+     * 性别
+     */
+    private String sex = "";
+    
+    /**
+     * 职业
+     */
+    private String profession = "";
+    
+    /**
+     * 图片路径
+     */
+    private String picturePath;
+    
+    /**
+     * 状态
+     */
+    private String status;
+    
+    /**
+     * 手机
+     */
+    private String mobile = "";
+    
+    /**
+     * 邮件
+     */
+    private String email = "";
+    
+    /**
+     * 用户等级
+     */
+    private int grade;
+    
+    /**
+     * 密码
+     */
+    private String pwd ;
+    
+    /**
+     * 积分
+     */
+    private int score ;
+    
+    /**
+     * 余额
+     */
+    private double balance ;
+    
+    /**
+     * 身份证
+     */
+    private String cardNo;
+    
+    /**
+     * 身份证是否绑定状态
+     */
+    private Integer cardStatus;
+    
+    /**
+     * 排名等级
+     */
+    private String level = "";
+    
+    
+    private int start;
+    
+    /**
+     * 页数
+     */
+    private int pageSize;
+    
+    /**
+     * 微信
+     */
+	private String wechatId;
+
+	/**
+	 * 微博
+	 */
+	private String weiboId;
+	
+	/**
+	 * 最后一次登录时间
+	 */
+	private String recentLoginTime;
+	
+	/**
+	 * 是否企业用户
+	 */
+	private int corporationFlag;
+	
+	/**
+	 * 证书
+	 */
+	private int certificateFlag;
+	
+	/**
+	 * 姓氏
+	 */
+	private String familyName;
+    
+	/**
+	 * 姓氏-外国
+	 */
+    private String lastName;
+    
+    /**
+     * 生日
+     */
+    private String birthday;
+    
+    /**
+     * 生日类型
+     */
+    private String birthdayCalenderType;
+    
+    /**
+     * id type
+     */
+    private String idType;
+    
+    /**
+     * id no
+     */
+    private String idNo;
+    
+    /**
+     * vip 类别
+     */
+    private String vipClass;
+    
+    /**
+     * token
+     */
+    private String token;
+    
+    /**
+     * 支付密码
+     */
+    private String payPwd;
+    
+    /**
+     * id
+     */
+    private String id;
+    
+    /**
+     * 等级名称
+     */
+    private String gradeName;
+    
+    /**
+     * 旧密码
+     */
+    private String oldPwd;
+    
+    /**
+     * 验证码
+     */
+    private String checkCode;
+}

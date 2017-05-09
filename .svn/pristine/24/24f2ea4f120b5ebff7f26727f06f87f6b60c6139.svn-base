@@ -1,0 +1,31 @@
+package com.paic.pawj.investigation.controller.vo;
+
+import com.paic.pawj.investigation.dao.OptionQueryDTO;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@Data
+public class OptionAppVO {
+	public OptionAppVO(OptionQueryDTO optionQueryDto){
+		this.optId = optionQueryDto.getOptionID();
+		this.optName = optionQueryDto.getOptionName();
+		this.qstId = optionQueryDto.getQuestionID();
+		this.optionCode = optionQueryDto.getOptionCode();
+	}
+
+	private String optId;
+	
+	private String optName;
+	
+	private String optionCode;
+	
+	private String qstId;
+	
+	private int answerStatus;
+	
+	private String optDesc;
+	
+	private String result;
+}

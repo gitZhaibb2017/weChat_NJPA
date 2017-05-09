@@ -1,0 +1,38 @@
+package com.paic.pawj.investigationVue.dao;
+
+import java.util.List;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class QuestionsDataVue {
+	
+	private String investigationId;
+	
+	private String questionsId;
+	//题目
+	private String ques;
+	//题目下标
+	private String currentIndex;
+	//题目类型，页面显示
+	private String type;
+	//题目类型
+	private String optionType;
+	//题目顺序
+	private String seq;
+	//选项
+	private List<OptionItem> optionItems;
+	
+	//选项列
+	private List<OptionColumnItem> optionColumnItems;
+	//默认
+	private String displayOrder;
+	//创建时间
+	private String	createTime;
+	
+	//创建时间
+	private String	updateTime;
+	
+}

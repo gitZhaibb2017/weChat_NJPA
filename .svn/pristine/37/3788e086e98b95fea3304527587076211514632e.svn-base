@@ -1,0 +1,108 @@
+package com.paic.pawj.partner.controller;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.paic.pawj.partner.dto.LotteryPartner;
+import com.paic.pawj.partner.service.LotteryPartnerService;
+
+
+
+@Controller
+@RequestMapping("/lotteryPartner/")
+public class LotteryPartnerController {
+
+	public static final Log LOG = LogFactory.getLog(LotteryPartnerController.class);
+	
+	@Autowired
+	private LotteryPartnerService lotteryPartnerService;
+	
+	/**
+	 * Description:查询获奖信息
+	 * 
+	 * @param page
+	 * @param rows
+	 * @param lotteryPrize
+	 * @return
+	 */
+	@RequestMapping("queryLotteryPartner.do")
+	@ResponseBody
+	public Map<String, Object> queryLotteryPartner(@RequestParam("page") int page, @RequestParam("rows") int rows,
+			LotteryPartner lotteryPartner){
+		lotteryPartner.setStart((page - 1)*rows);
+		lotteryPartner.setPageSize(rows);
+		return lotteryPartnerService.queryLotteryPartner(lotteryPartner);
+		
+	}
+	
+	/**
+	 * Description:添加获奖信息
+	 * 
+	 * @param prize
+	 * @return
+	 */
+	@RequestMapping("addLotteryPartner.do")
+	@ResponseBody
+	public Map<String, Object> addLotteryPartner(@ModelAttribute LotteryPartner lotteryPartner){
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		try {
+			lotteryPartnerService.addLotteryPartner(lotteryPartner);
+			resultMap.put("smg", true);
+		} catch (Exception e) {
+			LOG.debug("错误原因", e);
+			resultMap.put("errorSmg", false);
+		}
+		return resultMap;
+	}
+	
+	/**
+	 * Description:修改获奖信息
+	 * 
+	 * @param prize
+	 * @return
+	 */
+	@RequestMapping("updateLotteryPartner.do")
+	@ResponseBody
+	public Map<String, Object> updateLotteryPrize(@ModelAttribute LotteryPartner lotteryPartner){
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		try {
+			lotteryPartnerService.updateLotteryPartner(lotteryPartner);
+			resultMap.put("smg", true);
+		} catch (Exception e) {
+			LOG.debug("错误原因", e);
+			resultMap.put("errorSmg", "修改失败！");
+		}
+		return resultMap;
+	}
+	
+	/**
+	 * Description：删除获奖信息
+	 * 
+	 * @param prize
+	 * @return
+	 */
+	@RequestMapping("deleteLotteryPartner.do")
+	@ResponseBody
+	public Map<String, Object> deleteLotteryPartner(@RequestParam("userId") String userId){
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		try {
+			lotteryPartnerService.deleteLotteryPartner(userId);
+			resultMap.put("smg", true);
+		} catch (Exception e) {
+			LOG.debug("错误原因", e);
+			resultMap.put("errorSmg", false);
+		}
+		return resultMap;
+	}
+	
+	
+}

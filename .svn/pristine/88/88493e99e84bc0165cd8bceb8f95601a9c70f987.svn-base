@@ -1,0 +1,111 @@
+/**
+ * 
+ */
+package com.paic.pawj.auth.dao;
+
+import java.util.Map;
+
+import com.paic.pawj.basic.user.dao.User;
+import com.paic.pawj.basic.user.dto.UserInfo;
+
+
+/**
+ * @author happy
+ *
+ */
+public interface AuthMapper {
+	
+	/**
+	 * 登录
+	 * @param auth
+	 * @return
+	 */
+    public UserInfo login(Auth auth);
+    
+    /**
+     * 登录信息
+     * @param auth
+     */
+    public void loginInfo(Auth auth);
+    
+    /**
+     * 最近登录时间
+     * @param paramMap
+     */
+    public void recentLoginTime(Map<String, Object> paramMap);
+
+    /**
+     * 注册
+     * @param user
+     */
+    public void register(User user);
+    
+    /**
+     * Description:插入用户信息表
+     * 
+     * @param fo
+     */
+    public void insertUserInfo(UserInfo fo);
+    
+    /**
+     * Description:插入积分表
+     * 
+     * @param fo
+     */
+    public void insertAccount(UserInfo fo);
+    
+    /**
+     * 账号是否存在
+     */
+    public int queryUserHasExist(Map<String, Object> paramMap);
+    
+    /**
+     * 校验邀请码是否有效
+     */
+    public int checkInviteCode(Map<String, Object> paramMap);
+    
+    /**
+     * 使用邀请码
+     */
+    public void useInviteCode(Map<String, Object> paramMap);
+    
+    /**
+     * 查询邀请码是否使用
+     */ 
+    public int checkInviteCodeUsed(Map<String, Object> paramMap);
+    
+    /**
+     * 根据手机号、邮箱、账号获得userId
+     * @param paramMap
+     * @return
+     */
+    public Map<String, Object> queryUserId(Map<String, Object> paramMap);
+    
+    /**
+     * 验证手机号码是否已经注册4wechat
+     */
+    public int queryMoblieHasRegister(Map<String, Object> paramMap);
+    
+    /**
+     * 修改用户WechatId
+     */
+    public void updateWechatId(Map<String, Object> paramMap);
+    
+    /**
+     * 保存短息
+     * @param paramMap
+     */
+    public void insertCheckCode(Map<String, Object> paramMap);
+    
+    /**
+     * 校验短信验证码是否有效
+     * @param paramMap
+     */
+    public int checkCode(Map<String, Object> paramMap);
+    
+    /**
+     * 使用验证码
+     * @param paramMap
+     */
+    public void useCheckCode(Map<String, Object> paramMap);
+}

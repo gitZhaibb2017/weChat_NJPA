@@ -1,0 +1,46 @@
+package com.paic.pawj.partner.service;
+
+import java.util.Map;
+
+
+
+import com.paic.pawj.partner.dto.LotteryPartner;
+
+
+public interface LotteryPartnerService {
+	
+	/**
+	 * Description:查询获奖人员信息
+	 * 
+	 * @param lotteryPrize
+	 * @return
+	 */
+	public Map<String, Object> queryLotteryPartner(LotteryPartner lotteryPartner);
+
+	/**
+	 * Description:添加获奖人信息
+	 * 
+	 * @param lotteryPrize
+	 */
+	public void addLotteryPartner(LotteryPartner lotteryPartner);
+	
+	/**
+	 * Description:修改获奖人信息
+	 * 
+	 * @param lotteryPrize
+	 */
+	public void updateLotteryPartner(LotteryPartner lotteryPartner);
+	
+	/**
+	 * Description:删除获奖信人息
+	 * 
+	 * @param prizeId
+	 */
+	public void deleteLotteryPartner(String userId);
+	/**
+	 * Description:根据userID查询抽奖人信息
+	 * 
+	 * @param userId
+	 */
+	public boolean haveUserId(String userId);
+}

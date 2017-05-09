@@ -1,0 +1,20 @@
+package com.paic.pawj.answer.common.contants;
+
+public class AnswerType {
+	// 问题类型
+	public static final String RADIO_TYPE_OPTION = "mc";//单选题
+	
+	public static final String CHECK_TYPE_OPTION = "mcs";// 多选题
+	
+	public static final String PICTURE_RADIO_OPTION="pmc";//图片单选
+	
+	public static final String PICTURE_CHECK_OPTION="pmcs";//图片多选
+	
+	public static final String MATRIX_RADIO_OPTION="mmc";//矩阵单选
+	
+	public static final String MATRIX_CHECK_OPTION="mmcs";//矩阵多选
+	
+	public static final String EDIT_TYPE_OPTION = "qaq";//问答
+	
+	public static final String RATING_TYPE_OPTION = "scr";// 评分题
+}

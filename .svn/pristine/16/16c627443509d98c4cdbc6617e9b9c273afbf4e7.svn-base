@@ -1,0 +1,14 @@
+package com.paic.pawj.home.dao;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class HomeUserInfoDAO {
+	private String picturePath;
+	private String grade;
+	private String balance;
+	private String point;
+	private String accountId;
+}

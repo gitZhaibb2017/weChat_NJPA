@@ -1,0 +1,28 @@
+package com.paic.pawj.test.controller;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.paic.pawj.test.service.TestService;
+
+@Controller
+public class TestUserController {
+
+    @Autowired
+    private TestService testService;
+    
+    @RequestMapping("test.do")
+    @ResponseBody
+    public String test(String userId){
+        Map<String, String> map = new HashMap<String, String>();
+        System.out.println(userId);
+        map.put("test", testService.getUserName("test"));
+        
+        return map.get("test");
+    }
+}

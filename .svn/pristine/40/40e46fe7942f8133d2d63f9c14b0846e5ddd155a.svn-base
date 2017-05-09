@@ -1,0 +1,29 @@
+package com.paic.pawj.answer.common.contants;
+
+public class AnswerContants {
+
+	/**
+	 * 第一题标志位
+	 */
+	public static final String FIRST_MARK = "1";
+	
+	/**
+	 * 最后一题标志位
+	 */
+	public static final String LAST_MARK = "0";
+	
+	/**
+	 * 非首尾位
+	 */
+	public static final String USALLY_MARK="2";
+	
+	/**
+	 * 开始答题的标志
+	 */
+	public static final String RECORD_ZERO = "0";
+	
+	/**
+	 * 答题结束的标志
+	 */
+	public static final String RECORD_ONE = "1";
+}

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.paic.pawj.home.dao.HomeMapper">
+	<select id="getHomeAd" parameterType="java.util.HashMap" resultType="com.paic.pawj.home.dao.HpRollingDAO">
+		<![CDATA[SELECT name,path picPath,location,CONCAT('\'',forward_url,'\'') forwardUrl
+		FROM pawj_hp_rolling
+		where start_time <= str_to_date(#{startTime},'%Y-%m-%d %H:%i:%s')
+		  and end_time >= str_to_date(#{endTime},'%Y-%m-%d %H:%i:%s')
+		  and status = 0
+		order by location]]>
+	</select>
+	
+	<select id="getHpTopical" resultType="com.paic.pawj.home.dao.HpTopicalDAO">
+		select ht.topical_id topicalId, ht.qsr_id qsrId, ht.qsr_name qsrName, ht.seq ,ifnull(sar.answer_status,'0') answerStatus
+		FROM pawj_hp_topical ht
+		left JOIN pawj_sur_answers_record sar 
+		    on ht.qsr_id=sar.investigation_id 
+		    	and sar.user_id=#{userId}
+		order by ht.seq
+	</select>
+	
+	<select id="getHomeReport"  resultType="com.paic.pawj.home.dao.HpReportDAO">
+		select report_id reportId, report_name reportName, report_content reportContent
+		FROM pawj_hp_report
+		LIMIT 0,1
+	</select>
+	
+	<select id="getUserIcon" parameterType="java.lang.String" resultType="java.lang.String">
+		select ifnull(ui.picture_path,'def_user_icon.png') picturePath
+		FROM pawj_basic_user_info ui
+		where ui.user_id=#{userId}
+	</select>
+	
+	<insert id="insertCheckInData" parameterType="java.util.HashMap">
+		INSERT INTO account_point (
+			id,
+			account_id,
+			user_id,
+			point_change,
+			change_time,
+			source,
+			source_id
+		)
+		VALUES
+			(uuid(),
+			(SELECT account_id FROM account_account WHERE user_id = #{userId} LIMIT 1),
+			#{userId},#{point},#{date},#{source},#{sourceId})
+	</insert>
+	
+	<update id="updateCheckInPoint" parameterType="java.util.HashMap">
+		update account_account set point=point+#{point}
+		where user_id=#{userId}
+	</update>
+	
+	<select id="getCheckInStatus" parameterType="java.util.HashMap" resultType="Integer">
+		select ifnull(sum(point_change),0)
+		FROM account_point
+		where source_id=1
+		  and DATE_FORMAT(change_time,'%Y-%m-%d')=str_to_date(#{checkInDate},'%Y-%m-%d')
+		  and user_id=#{userId}
+	</select>
+	
+	<select id="getContinuousCIDate" parameterType="java.util.HashMap" resultType="java.lang.String">
+		<![CDATA[
+		select DATE_FORMAT(ap.change_time,'%Y-%m-%d') from account_point ap 
+		where ap.user_id= #{userId}
+			and ap.change_time<=str_to_date(#{endDate},'%Y-%m-%d')
+			and ap.change_time>=str_to_date(#{startDate},'%Y-%m-%d')
+			and ap.source_id=1
+		order by ap.change_time desc
+		]]>
+	</select>
+	
+	
+</mapper>

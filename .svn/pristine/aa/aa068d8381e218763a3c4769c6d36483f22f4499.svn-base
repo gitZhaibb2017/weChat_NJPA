@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>余额</title>
+<link href="../../css/main.css" rel="stylesheet" media="screen and (max-width: 320px)" />  
+<link href="../../css/main.css" rel="stylesheet" media="screen and (min-width: 321px) and (max-width: 640px)" />  
+<link href="../../css/main.css" rel="stylesheet" media="screen and (min-width: 641px) and (max-width: 2560px)" /> 
+<script type="text/javascript" src="../../../libs/easyui/zepto.js"></script>
+<script type="text/javascript" src="../../js/balance.js"></script>
+</head>
+
+<body>
+<header><i id="goBack" onClick="goBack()"></i><span>余额</span></header>
+
+<div class="backgroundWhite">
+	<div class="balance01">
+		<span>账户余额（元）</span>
+		<!-- <label></label> -->
+	</div>
+    <div class="balance02"><a id="balance" href="balanceDetail.html"></a></div>
+</div>
+
+<div class="balance03"></div>
+
+<div class="balance04" onclick="recharge()">
+	<a class="balanceSpan">充值</a>
+	<label class="balanceLabel"></label>
+</div>
+<div class="balance05" onclick="withDraw()">
+	<a class="balanceSpan">提现</a>
+	<label class="balanceLabel"></label>
+</div>
+
+</body>
+</html>

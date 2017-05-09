@@ -1,0 +1,35 @@
+<!doctype html>
+<html class="bgWhite">
+<head >
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>匿名评价</title>
+<link href="../../css/main.css" rel="stylesheet"
+	media="screen and (max-width: 320px)" />
+<link href="../../css/main.css" rel="stylesheet"
+	media="screen and (min-width: 321px) and (max-width: 640px)" />
+<link href="../../css/main.css" rel="stylesheet"
+	media="screen and (min-width: 641px) and (max-width: 2560px)" />
+	<link href="../../css/popup.css" rel="stylesheet"
+	media="screen and (max-width: 2560px)" />
+</head>
+<script type="text/javascript" src="../../../libs/easyui/zepto.js"></script>
+<script type="text/javascript" src="../../js/answer/reward.js"></script>
+<script type="text/javascript" src="../../js/common/validate_h5.js"></script>
+<script type="text/javascript" src="../../js/personInfo/popup.js"></script>
+<body class="bgWhite">
+	<header>
+		<i onclick="commBack()"></i><span>匿名评价</span>
+	</header> 
+
+	<div class="evaluteTitle">
+		<h1>恭喜答题完毕！</h1>
+		<h2>
+			积分 <span id="comScore"></span>
+		</h2>
+		<h2>
+			余额 <span id="comBalance"></span>
+		</h2>
+	</div>
+</body>
+</html>

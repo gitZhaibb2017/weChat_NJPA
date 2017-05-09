@@ -1,0 +1,28 @@
+package com.paic.pawj.investigation.controller.vo;
+
+import java.util.List;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@Data
+public class QuestionAppVO {
+	private String qstId;
+	
+	private int questionSeq;
+	
+	private String questionName;
+	
+	private String questionType;
+	
+	private String qsrId;
+	
+	private List<OptionAppVO> options;
+	
+	private String result;
+
+	private int questionStatus;
+	
+	private List<MatrixAppVO> matrixs;
+}

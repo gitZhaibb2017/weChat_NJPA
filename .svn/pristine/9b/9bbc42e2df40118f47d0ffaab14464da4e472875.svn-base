@@ -1,0 +1,58 @@
+/**
+ * 
+ */
+package com.paic.pawj.auth.dao;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class Auth implements java.io.Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6726812279073143311L;
+
+	/**
+	 * userId
+	 */
+	private String userId;
+	
+	/**
+	 * 登录账号
+	 */
+	private String loginName;
+	
+	/**
+	 * 账号
+	 */
+	private String userName;
+	
+	/**
+	 * 登陆手机号
+	 */
+	private String mobile;
+	
+	/**
+	 * 登陆邮箱
+	 */
+	private String email;
+	
+	/**
+	 * 密码
+	 */
+	private String pwd;
+
+	/**
+	 * 登陆时间
+	 */
+	private String loginTime;
+	
+	/**
+	 * 登陆方式
+	 */
+	private int loginType;
+
+}

@@ -1,0 +1,281 @@
+@charset "UTF-8";
+.main {
+	background-color: #fff;
+	font-size: 4.2rem;
+}
+.main > img {
+	width: 100%;
+}
+.main span.tf_01 {
+	display: block;
+	position: relative;
+	/* font-size: 4.2rem; */
+	line-height: 5rem;
+	padding: 6rem;
+}
+.main span.tf_01:before {
+	content: "";
+	position: absolute;
+	top: 2rem;
+	left: 2rem;
+	width: 6.8rem;
+	height: 5.6rem;
+	background: url(../img/decorate1.png) center left no-repeat;
+	background-size: 6.8rem 5.6rem;
+}
+.main span.tf_01:after {
+	content: "";
+	position: absolute;
+	bottom: 2rem;
+	right: 2rem;
+	width: 6.8rem;
+	height: 5.6rem;
+	background: url(../img/decorate2.png) center left no-repeat;
+	background-size: 6.8rem 5.6rem;
+}
+
+.main span.tf_02 {
+	display: block;
+	position: relative;
+	/* font-size: 4.2rem; */
+	line-height: 5rem;
+	padding: 41rem 15rem 0 6rem;
+}
+.main span.tf_02:before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 5rem;
+	width: 34.6rem;
+	height: 39.9rem;
+	background: url(../img/pic1.png) center left no-repeat;
+	background-size: 34.6rem 39.9rem;
+}
+.main span.tf_02:after {
+	content: "";
+	position: absolute;
+	top: 7.5rem;
+	left: 35rem;
+	width: 25.4rem;
+	height: 29.8rem;
+	background: url(../img/pic2.png) center left no-repeat;
+	background-size: 25.4rem 29.8rem;
+}
+.main span.tf_03 {
+	display: block;
+	position: relative;
+	/* font-size: 4.2rem; */
+	line-height: 5rem;
+	padding: 41rem 6rem 0 15rem;
+}
+.main span.tf_03:before {
+	content: "";
+	position: absolute;
+	top: 0;
+	right: 5rem;
+	width: 34.6rem;
+	height: 39.9rem;
+	background: url(../img/pic3.png) center left no-repeat;
+	background-size: 34.6rem 39.9rem;
+}
+.main span.tf_03:after {
+	content: "";
+	position: absolute;
+	top: 7.5rem;
+	right: 35rem;
+	width: 25.4rem;
+	height: 29.8rem;
+	background: url(../img/pic4.png) center left no-repeat;
+	background-size: 25.4rem 29.8rem;
+}
+
+.main span.tf_04 {
+	display: block;
+	position: relative;
+	/* font-size: 4.2rem; */
+	line-height: 5rem;
+	padding: 41rem 15rem 0 6rem;
+}
+.main span.tf_04:before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 5rem;
+	width: 34.6rem;
+	height: 39.9rem;
+	background: url(../img/pic5.png) center left no-repeat;
+	background-size: 34.6rem 39.9rem;
+}
+.main span.tf_04:after {
+	content: "";
+	position: absolute;
+	top: 7.5rem;
+	left: 35rem;
+	width: 25.4rem;
+	height: 29.8rem;
+	background: url(../img/pic6.png) center left no-repeat;
+	background-size: 25.4rem 29.8rem;
+}
+
+.main div.af_01 {
+	margin: 6rem 6rem;
+    text-align: center;
+}
+.main div.af_01 img {
+	width: 18rem;
+  	height: 18rem;
+  	margin: 5rem auto 2rem auto;
+}
+.main div.af_01 span {
+	display: block;
+  	width: 100%;
+  	text-align: center;
+  	color: #f60;
+  	/* font-size: 4.2rem; */
+  	line-height: 5rem;
+}
+.main div.af_01 span:last-child {
+	margin: 6rem 0;
+  	color: #252525;
+}
+
+.main ul.rf_01 {
+	list-style-type: none;
+	padding-left: 6rem;
+	margin: 7rem 6rem;
+	border: 0.3rem solid #999;
+	line-height: 7rem;
+	/* font-size: 4.2rem; */
+}
+.main ul.rf_01 li:first-child,
+.main ul.rf_02 li:first-child,
+.main ul.rf_03 li:first-child {
+	width: 100%;
+	height: 9rem;
+	line-height: 8rem;
+  	/* font-size: 4.2rem; */
+  	text-align: center;
+  	color: #fff;
+	background: url(../img/title_bg.png) center top no-repeat;
+	background-size: 28rem 8rem;
+}
+.main ul.rf_01 li {
+	margin: 5rem 0;
+}
+.main ul.rf_01 li h1 {
+	margin: 2rem 0;
+	font-size: 4.2rem;
+}
+.main ul.rf_02,
+.main ul.rf_03 {
+	position: relative;
+	list-style-type: none;
+	padding: 3rem 6rem 20rem 6rem;
+	margin: 12rem 6rem;
+	line-height: 6rem;
+  	text-align: center;
+	/* font-size: 1.8rem; */
+	background: url(../img/enter_bg.png) no-repeat center; 
+	background-size: 110% 100%;
+}
+.main ul.rf_02:before,
+.main ul.rf_03:before {
+	content: "";
+	position: absolute;
+	width: 100%;
+	height: 10rem;
+	top: -10rem;
+	left: 0;
+	background: url(../img/decorate71.png) no-repeat center;
+	background-size: 9.7rem 3.3rem;
+}
+/* .main ul.rf_02 li:first-child {
+	width: 100%;
+	height: 9rem;
+	text-align: center;
+	line-height: 8rem;
+  	font-size: 2.4rem;
+  	color: #fff;
+	background: url(../img/title_bg.png) center top no-repeat;
+	background-size: 28rem 8rem;
+} */
+.main ul.rf_02 li,
+.main ul.rf_03 li {
+	margin: 5rem 0;
+}
+.main ul.rf_02 a {
+	display: block;
+	width: 26rem;
+	height: 6rem;
+	margin: 2rem auto;
+	line-height: 6rem;
+	font-size: 3.2rem;
+	background: url(../img/btn.png) no-repeat center;
+	background-size: 100% 100%;
+}
+
+.main ul.rf_03 {
+	margin: 12rem 0;
+	background: url(../img/prize_bg@2x.png) no-repeat center; 
+	background-size: 110% 100%;
+}
+
+.main ul.rf_03 .rf_03_01,
+.main ul.rf_03 .rf_03_02,
+.main ul.rf_03 .rf_03_03 {
+	position: relative;
+	margin: 10rem 0 0 20rem;
+	text-align: left;
+}
+
+.main ul.rf_03 .rf_03_01:before {
+	content: "";
+	position: absolute;
+	height: 18rem;
+	width: 18rem;
+	top: -8rem;
+	left: -20rem;
+	background: url(../img/prize_first@2x.png) no-repeat center;
+	background-size: 100% 100%;
+}
+.main ul.rf_03 .rf_03_02:before {
+	content: "";
+	position: absolute;
+	height: 18rem;
+	width: 18rem;
+	top: -5rem;
+	left: -20rem;
+	background: url(../img/prize_second@2x.png) no-repeat center;
+	background-size: 100% 100%;
+}
+.main ul.rf_03 .rf_03_03:before {
+	content: "";
+	position: absolute;
+	height: 18rem;
+	width: 18rem;
+	top: -5rem;
+	left: -20rem;
+	background: url(../img/prize_third@2x.png) no-repeat center;
+	background-size: 100% 100%;
+}
+
+.main span.end {
+	display: block;
+	position: relative;
+	width: 100%;
+	height: 10rem;
+	margin-bottom: 27rem;
+	font-size: 6.4rem;
+	text-align: center;
+}
+.main span.end:after {
+	content: "";
+	position: absolute;
+	bottom: -27rem;
+	width: 100%;
+	left: 0;
+	height: 27.7rem;
+	background: url(../img/gift.png) no-repeat center;
+	background-size: 27.7rem 26.1rem;
+	background-color: #fff;
+}

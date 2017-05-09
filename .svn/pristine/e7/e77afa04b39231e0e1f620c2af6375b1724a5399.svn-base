@@ -1,0 +1,46 @@
+package com.paic.pawj.report.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import com.paic.pawj.report.dto.ReportDTO;
+import com.paic.pawj.report.dto.ReportVoteDTO;
+
+public interface ReportMapper {
+
+	/**
+	 * 获得微报告列表-支持分页
+	 */
+	public List<ReportDTO> queryReportList(ReportDTO reportDTO);
+	
+	/**
+	 * 获取微报告记录数
+	 * @param paramMap
+	 * @return
+	 */
+	public int queryReportCount(ReportDTO reportDTO);
+	
+	/**
+	 * 查询投票记录
+	 * @param paramMap
+	 * @return
+	 */
+	public int queryVoteCount(ReportVoteDTO reportVoteDTO);
+	
+	/**
+	 * 新增微报告投票记录
+	 * @param reportVoteDTO
+	 */
+	public void addReportInfo(ReportVoteDTO reportVoteDTO);
+	
+	/**
+	 * 修改微报告投票记录数
+	 * @param paramMap
+	 */
+	public void updateReportVote(ReportVoteDTO reportVoteDTO);
+	
+	/**
+	 * 获得投票数
+	 */
+	public ReportDTO queryReportInfo(Map<String, Object> paramMap);
+}

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.paic.pawj.report.dao.ReportMapper">
+	<resultMap id="report" type="com.paic.pawj.report.dto.ReportDTO">
+		<id column="report_id" property="reportId"  />
+	    <result column="report_name" property="reportName"  />
+	    <result column="report_content" property="reportContent" />
+		<result column="create_time" property="createTime" />
+		<result column="report_type" property="reportType" />
+		<result column="agree_count" property="agreeCount" />
+		<result column="against_count" property="againstCount" />
+	</resultMap>
+	
+	<resultMap id="reportVote" type="com.paic.pawj.report.dto.ReportVoteDTO">
+		<id column="vote_id" property="voteId"  />
+	    <result column="report_id" property="reportId"  />
+	    <result column="user_id" property="userId" />
+		<result column="vote_type" property="voteType" />
+		<result column="create_time" property="createTime" />
+	</resultMap>
+	
+	<!-- 获取趣味报告列表 -->
+	<select id="queryReportList" resultMap="report" parameterType="com.paic.pawj.report.dto.ReportDTO">
+		SELECT
+		report_id,
+		report_name,
+		report_content,
+		create_time,
+		report_type,
+		agree_count,
+		against_count
+		FROM
+		`pawj_hp_report` 
+		where 1=1
+		<if test="reportType != null">
+			and `report_type` = #{reportType}
+		</if>
+		order by create_time desc
+		limit #{start},#{pageSize}
+	</select>
+	
+	<!-- 获得趣味报告数量 -->
+	<select id="queryReportCount" resultType="int" parameterType="com.paic.pawj.report.dto.ReportDTO">
+		SELECT
+		count(1)
+		FROM
+		`pawj_hp_report` 
+		where 1=1
+		<if test="reportType != 0">
+			and `report_type` = #{reportType}
+		</if>
+	</select>
+	
+	<!-- 查询用户在相同微报告是否已经投过票 -->
+	<select id="queryVoteCount" parameterType="com.paic.pawj.report.dto.ReportVoteDTO" resultType="int" >
+		select count(1) cnt 
+		from
+		`pawj_hp_report_vote` t
+		where 
+		t.user_id = #{userId}
+		and
+		t.report_id = #{reportId}
+	</select>
+	
+	<!-- 添加投票记录 -->
+	<insert id="addReportInfo" parameterType="com.paic.pawj.report.dto.ReportVoteDTO">
+		insert into
+			`pawj_hp_report_vote`
+		(
+			vote_id,
+			report_id,
+			user_id,
+			vote_type,
+			create_time
+		)
+		values
+		(
+			replace(uuid(),'-',''),
+			#{reportId},
+			#{userId},
+			#{voteType},
+			now()
+		)
+	</insert>
+	
+	<!-- 修改微报告投票数  voteType:1赞成；0反对-->
+	<update id="updateReportVote" parameterType="com.paic.pawj.report.dto.ReportVoteDTO">
+		update 
+			`pawj_hp_report` t 
+		set 
+		<choose>
+			<when test="voteType == 1">
+				t.agree_count = t.agree_count + 1
+			</when>
+			<when test="voteType == 0">
+				t.against_count = t.against_count + 1
+			</when>
+		</choose>
+		where 
+			t.report_id = #{reportId}
+	</update>
+	
+	<!-- 获得投票数 -->
+	<select id="queryReportInfo" resultMap="report" parameterType="map">
+		SELECT
+			report_id,
+			agree_count,
+			against_count
+			FROM
+			`pawj_hp_report` 
+		where 
+			report_id = #{reportId}
+	</select>
+	
+</mapper>

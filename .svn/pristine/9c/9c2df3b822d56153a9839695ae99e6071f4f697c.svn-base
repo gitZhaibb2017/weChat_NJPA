@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.paic.pawj.lottery.dao.LotteryMapper">
+	<select id="queryCurrentPrize" parameterType="java.sql.Timestamp" 
+			resultType="com.paic.pawj.lottery.dao.Prize">
+	<![CDATA[
+		SELECT prize_id prizeID,prize_name prizeName FROM lottery_prize l
+		where l.start_time < #{time}
+		and l.end_time > #{time}
+		order by start_time
+		limit 1
+	]]>
+	</select>
+	
+		
+	<insert id="insertVoteRecord" parameterType="com.paic.pawj.lottery.dao.VoteRecord">
+		INSERT INTO lottery_vote_record(voter, voted_man, prize_id,time)
+		VALUES(#{voter}, #{votedMan}, #{prizeID},#{time})
+	</insert>
+	
+	<select id="queryAllPartners" resultType="com.paic.pawj.lottery.dao.Partner">
+		SELECT  user_id userID,user_name userName,status,path 
+		FROM lottery_partner l
+		where l.status = '1'
+	</select>
+	
+	<select id="queryVotedNumber" parameterType="com.paic.pawj.lottery.dao.VoteRecord"
+	        resultType="com.paic.pawj.lottery.dao.VoteRecord">
+		select t1.prize_id prizeID,t1.vote_num voteNum,t2.voted_num votedNum
+		from lottery_prize t1,(
+			 SELECT voter,prize_id,count(record_id) voted_num FROM lottery_vote_record l
+		     where voter = #{voter}
+		     and prize_id = #{prizeID}
+		     group by voter,prize_id) t2
+		where t1.prize_id = t2.prize_id
+	</select>
+	
+	<update id="updatePrizeStart" parameterType="com.paic.pawj.lottery.dao.Prize">
+		update lottery_prize
+		set start_time = #{startTime},
+		    end_time = Date_add(now(), interval + 1 hour)
+		where prize_id = #{prizeID}
+	</update>
+	
+	<update id="updatePrizeEnd" parameterType="com.paic.pawj.lottery.dao.Prize">
+		update lottery_prize
+		set end_time = #{endTime},
+		status = '2'
+		where prize_id = #{prizeID}
+	</update>
+	
+	<select id="selectWinerByPrize" parameterType="int"
+		    resultType="com.paic.pawj.lottery.dao.Partner">
+		select user_id userID,user_name userName,status,path,votedNum 
+		from (SELECT voted_man votedMan,count(record_id) votedNum
+				FROM lottery_vote_record
+				where prize_id = #{prizeID}
+				group by voted_man ) t1, lottery_partner t2
+		where t1.votedMan = t2.user_id
+		and t2.status = 1
+		order by t1.votedNum desc
+		limit 0,10
+	</select>
+	
+	<update id="updatePartnerPrize" parameterType="com.paic.pawj.lottery.dao.Winners">
+		update lottery_partner
+		set status = '2',
+		prize_id=#{prizeID}
+		where user_Id in 
+		<foreach item="item" index="index" collection="partners" open="(" separator="," close=")">
+		#{item}
+		</foreach>
+	</update>
+	
+	<select id="getInitPrizeByID" resultType="com.paic.pawj.lottery.dao.Prize" parameterType="String" >
+		SELECT prize_id prizeID,prize_name prizeName,start_time startTime,end_time endTime,status
+		FROM lottery_prize 
+		where prize_id = #{prizeID}
+	</select>
+	
+	<select id="getInitPrizeByLevel" resultType="com.paic.pawj.lottery.dao.Prize" parameterType="String" >
+		SELECT prize_id prizeID,prize_name prizeName,start_time startTime,end_time endTime,status,
+		       vote_num voteNum,winner_num winnerNum,level
+		FROM lottery_prize 
+		where level = #{level}
+		and status = '1'
+		limit 1
+	</select>
+	
+	<insert id="insertPrize" parameterType="com.paic.pawj.lottery.dao.Prize">
+		insert into lottery_prize(prize_id,prize_name,start_time,end_time,vote_num,winner_num,status,level)
+		values(#{prizeID},#{prizeName},#{startTime},#{endTime},#{voteNum},#{winnerNum},#{status},#{level})
+	</insert>
+	
+	<select id="queryAllPrize" resultType="com.paic.pawj.lottery.dao.Prize">
+		SELECT prize_id prizeID,prize_name prizeName,start_time startTime,end_time endTime,status,
+		       vote_num voteNum,winner_num winnerNum,level
+		FROM lottery_prize 
+		where status = '1'
+	</select>
+</mapper>

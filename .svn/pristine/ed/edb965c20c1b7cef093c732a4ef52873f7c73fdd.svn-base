@@ -1,0 +1,16 @@
+package com.paic.pawj.answer.dao;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class ParameterCommon<T> {
+
+	private String requestTime;
+
+	private String trackId;
+
+	private T data;
+
+}

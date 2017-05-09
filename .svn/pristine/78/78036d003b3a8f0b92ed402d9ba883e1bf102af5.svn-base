@@ -1,0 +1,17 @@
+package com.paic.pawj.answer.controller.vo;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@Data
+public class AnswersVO {
+	private String answerContent;
+	
+	private String answerType;
+	
+	private String qsrId;
+	
+	private String qstId;
+
+}

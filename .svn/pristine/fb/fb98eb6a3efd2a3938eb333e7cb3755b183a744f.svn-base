@@ -1,0 +1,15 @@
+package com.paic.pawj.common.dao;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class DictionaryDetailDAO {
+	private String dicDetailId;
+	private String dicId;
+	private String dicName;
+	private String dicCode;
+	private String dicValue;
+	private String dicDesc;
+}

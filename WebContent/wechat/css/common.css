@@ -1,0 +1,75 @@
+@charset "UTF-8";
+body, ol, ul, li, p, h1, h2 {
+	margin: 0;
+	padding: 0;
+}
+html, body {
+	width: 100%;
+	height: 100%;
+	color: #252525;
+	font-size: 62.5%;
+	font-family: Arial, "Microsoft yaHei";
+	background-color: #efeff4;
+}
+input, textarea, a {
+	outline: none;
+	color: #252525;
+	font-size: 62.5%;
+	font-family: Arial, "Microsoft yaHei";
+}
+
+a.back {
+	display: block;
+	position: fixed;
+	height: 6rem;
+	width: 10rem;
+	top: 0;
+	left: 0;
+	font-size: 4.2rem;
+	font-weight: 700;
+	line-height: 6rem;
+	background-color: #f90;
+	color: #fff;
+	text-align: center;
+}
+a.more {
+	display: block;
+	float: left;
+	width: 100%;
+	height: 8rem;
+	margin-bottom: 5rem;
+	border-bottom: 1px solid #999;
+	text-align: center;
+	line-height: 3rem;
+	font-size: 7rem;
+	background: url(../img/dropdown1@2x.png) no-repeat center;
+}
+.cover {
+	position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: #000;
+    opacity: 0.7;
+    z-index: 99;
+}
+.msg {
+	position: fixed;
+    display: block;
+    top: 30%;
+    width: 60rem;
+    min-height: 6rem;
+    max-height: 50rem;
+    margin-left: -33rem;
+    left: 50%;
+    padding: 3rem;
+    background-color: #fff;
+    z-index: 100;
+    border-radius: 1rem;
+    line-height: 6rem;
+    font-size: 4.2rem;
+    text-align: center;
+    word-wrap: break-word;
+    overflow-y: auto;
+}

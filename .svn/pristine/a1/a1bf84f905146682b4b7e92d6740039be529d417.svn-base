@@ -1,0 +1,56 @@
+<!doctype html>
+<html class="bgWhite">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<title>问卷调查</title>
+<link href="../../css/main.css" rel="stylesheet" />
+<!-- <link href="../../css/confere/conference.css" rel="stylesheet" type="text/css" /> -->
+<script type="text/javascript" src="../../../libs/easyui/zepto.js"></script>
+<script type="text/javascript" src="../../../libs/easyui/iscroll.js"></script>
+<script type="text/javascript" src="../../js/common/common.js"></script>
+<script type="text/javascript" src="../../js/answer/conference.js"></script>
+<script type="text/javascript" src="../../../libs/easyui/fastclick.js"></script>
+
+</head>
+<body class="bgWhite">
+	<div id="scroll_container">
+		<div class='main_container' id='main_container'>
+			<div class='refresh'>
+				<img src='../../images/xiala.png'><span>下拉刷新</span>
+			</div>
+			<header>
+				<span>答题</span>
+			</header>
+			<div class="hot">
+
+				<div class="hot_title">
+					适合我的<a class="class_right" style="float: right; color: #919da2">更多>></a>
+				</div>
+				<ul class="hot_content">
+					<li><a>1.居民消费满意度调查</a><span><label style="width: 80%;"></label></span><b>99913.58</b></li>
+					<li><a>2.宝强离婚你怎么看？</a><span><label style="width: 20%;"></label></span><b>99913.58</b></li>
+					<li><a>3.2016年度最信任品牌电动车大数据调查</a><span><label style="width: 50%;"></label></span><b>99913.58</b></li>
+					<li><a>4.宝强离婚你怎么看？</a><span><label style="width: 40%;"></label></span><b>99913.58</b></li>
+					<li><a>5.2016年度最信任品牌电动车大数据调查</a><span><label style="width: 30%;"></label></span><b>99913.58</b></li>
+				</ul>
+			</div>
+			<div class="hot">
+				<div class="hot_title">
+					全部问卷<a class="class_right" style="float: right; color: #919da2">更多>></a>
+				</div>
+				<ul class="hot_content">
+					<li id="name">
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<ul class="footer">
+		<li><a href="../homePage/index.html"><img src="../../images/icon_home.png" /><b>首页</b></a></li>
+		<li><a href="#conference.html"><img src="../../images/icon_interlocutionOn.png" /><b style="color: rgb(257,77,77)">问答</b></a></li>
+		<li><a href="../perInfo/report.html"><img src="../../images/icon_report.png" /><b>报告</b></a></li>
+		<li><a href="../perInfo/personInfor.html"><img src="../../images/icon_me.png" /><b>我</b></a></li>
+	</ul>
+</body>
+</html>

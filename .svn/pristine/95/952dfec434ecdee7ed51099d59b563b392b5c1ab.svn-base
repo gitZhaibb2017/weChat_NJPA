@@ -1,0 +1,573 @@
+/**
+ *
+ */
+package com.paic.pawj.answer.service.impl;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+import com.paic.pawj.answer.common.contants.AnswerContants;
+import com.paic.pawj.answer.common.contants.AnswerType;
+import com.paic.pawj.answer.dao.AnswersMapper;
+import com.paic.pawj.answer.dto.AnswerQuestion;
+import com.paic.pawj.answer.dto.AnswerRecord;
+import com.paic.pawj.answer.dto.Answers;
+import com.paic.pawj.answer.dto.BusinvestigationDTO;
+import com.paic.pawj.answer.service.AnswersService;
+import com.paic.pawj.answer.vo.AnswersVO;
+import com.paic.pawj.answer.vo.MutilateOption;
+import com.paic.pawj.basic.account.service.AccountChangeService;
+import com.paic.pawj.common.util.ReturnConstants;
+import com.paic.pawj.investigation.controller.vo.MatrixAppVO;
+import com.paic.pawj.investigation.controller.vo.OptionAppVO;
+import com.paic.pawj.investigation.controller.vo.QuestionAppVO;
+import com.paic.pawj.investigation.dao.OptionQueryDTO;
+import com.paic.pawj.investigation.dao.Question;
+
+@Service("answersService")
+public class AnswersServiceImpl implements AnswersService {
+
+	@Autowired
+	private AccountChangeService accountChangeService;
+
+	@Resource
+	private AnswersMapper answersDao;
+
+	/**
+	 * 上传文件返回前缀路径
+	 */
+	@Value("${pawj.perfixUrl}")
+	private String perfixUrl;
+
+	@Override
+	public void saveAnswers(Answers answers) {
+		answersDao.saveAnswers(answers);
+	}
+
+	@Override
+	public List<Map<String, Object>> queryQstnaireList() {
+		return answersDao.queryQstnaireList();
+	}
+
+	@Override
+	public String getQsrCompletionPercent(String qsrId) {
+		int answersCount = answersDao.getAnswerUserCount(qsrId);
+		Integer qsrNumber = answersDao.getQsrNumber(qsrId);
+
+		String res = "0";
+		String completionPercent = "";
+		if (qsrNumber != null) {
+			completionPercent = getPercent(answersCount, qsrNumber);
+		}
+		if (completionPercent.indexOf(".") > 0) {
+			res = completionPercent.substring(0, completionPercent.indexOf("."));
+		}
+		return res;
+	}
+
+	private String getPercent(int x, int total) {
+		String result = "";
+		try {
+			double x_double = x * 1.0;
+			double tempres = x_double / total;
+			DecimalFormat df1 = new DecimalFormat("0.00%");
+			result = df1.format(tempres);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+
+	@Override
+	@Transactional
+	public JsonObject answers(List<AnswersVO> answersList, String userID, int completed) {
+		JsonObject result = new JsonObject();
+		String ivtgID = answersList.get(0).getQsrId();
+		if (isNotAnswered(ivtgID, userID)) {
+			Map<String, List<AnswersVO>> map = answersToMap(answersList);
+			Answers answers = null;
+			for (String key : map.keySet()) {
+				answers = voToAnswers(map.get(key), userID);
+				if (null != answers) {
+					answersDao.saveAnswers(answers);
+				}
+			}
+
+			if (1 == completed) {
+				String investigationID = answersList.get(0).getQsrId();
+				insertAnswerRecord(ivtgID, userID);
+				accountChangeService.changeAccountByIvtg(userID, investigationID);
+			}
+			result.addProperty(ReturnConstants.CODE_KEY, ReturnConstants.NORMAL_CODE);
+		} else {
+			result.addProperty(ReturnConstants.CODE_KEY, "1001");
+		}
+
+		return result;
+
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	private Map<String, List<AnswersVO>> answersToMap(List<AnswersVO> answersList) {
+		Map<String, List<AnswersVO>> map = new HashMap<String, List<AnswersVO>>();
+		List<AnswersVO> questionAnswers = null;
+		for (AnswersVO vo : answersList) {
+			if (map.containsKey(vo.getQstId())) {
+				map.get(vo.getQstId()).add(vo);
+			} else {
+				questionAnswers = new ArrayList<AnswersVO>();
+				questionAnswers.add(vo);
+				map.put(vo.getQstId(), questionAnswers);
+			}
+
+		}
+		return map;
+	}
+
+	private Answers voToAnswers(List<AnswersVO> list, String userID) {
+		Answers answers = null;
+		// if (CollectionUtils.isNotEmpty(list)) {
+		// answers = new Answers();
+		// StringBuilder content = new StringBuilder();
+		// for (AnswersVO vo : list) {
+		// content.append(vo.getAnswerContent());
+		// content.append(';');
+		// answers.setAnswerType(vo.getAnswerType());
+		// answers.setQsrId(vo.getQsrId());
+		// answers.setQstId(vo.getQstId());
+		// }
+		// content.deleteCharAt(content.lastIndexOf(";"));
+		// answers.setAnswerContent(content.toString());
+		// answers.setUserId(userID);
+		// }
+
+		return answers;
+	}
+
+	@Override
+	public AnswerRecord getAnswerRecord(AnswerRecord answerRecord) {
+		return answersDao.queryAnswerRecordByUser(answerRecord);
+	}
+
+	@Override
+	public boolean isNotAnswered(String ivtgId, String userId) {
+		boolean res = false;
+		AnswerRecord record = new AnswerRecord();
+		record.setInvestigationId(ivtgId);
+		record.setUserId(userId);
+		AnswerRecord result = answersDao.queryAnswerRecordByUser(record);
+		if (null == result) {
+			res = true;
+		}
+		return res;
+	}
+
+	@Override
+	public void insertAnswerRecord(String ivtgID, String userID) {
+		addAnswerRecord(ivtgID, userID, "1");
+	}
+
+	/**
+	 * 保存答题记录
+	 *
+	 * @param ivtgID
+	 * @param userID
+	 */
+	private void addAnswerRecord(String ivtgId, String userId, String status) {
+		AnswerRecord record = new AnswerRecord();
+		record.setInvestigationId(ivtgId);
+		record.setUserId(userId);
+		record.setAnswerStatus(status);
+		answersDao.insertAnswerRecord(record);
+	}
+
+	/**
+	 * 查询答题记录是否存在
+	 */
+	private boolean getAnswerRecord(String ivtgId, String userId) {
+		AnswerRecord record = new AnswerRecord();
+		record.setInvestigationId(ivtgId);
+		record.setUserId(userId);
+		return (answersDao.getAnswerRecord(record) > 0);
+	}
+
+	@Override
+	public Map<String, Object> getNextQuestionByParam(Answers param) {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		try {
+			// 当前问卷为首次进入，默认返回问卷第一题
+			if (param.getQuestMark().equals(AnswerContants.FIRST_MARK)) {
+				resultMap = getTheFirstQuestionByParam(param, resultMap);
+			} else {
+				String nextQuestionId = null;
+				List<String> questionList = answersDao.getTheLastQuestion(param.getQuestionId());
+				for (String questionId : questionList) {
+					String associateOptionId = answersDao.getAssociateByQuestionId(questionId);
+					if (StringUtils.isNotBlank(associateOptionId)) {
+						param.setAssociateOptionId(associateOptionId);
+						int count = answersDao.getTheAnswersAssociatedByOption(param);
+						if (1 == count) {
+							nextQuestionId = questionId;
+							break;
+						} else {
+							continue;
+						}
+					} else {
+						nextQuestionId = questionId;
+						break;
+					}
+				}
+				String qtype = answersDao.getQuestionTypeById(nextQuestionId);
+				if (AnswerType.EDIT_TYPE_OPTION.equals(qtype)) {
+					backTheQaqTypeQuestion(nextQuestionId, resultMap);
+
+				} else {
+					judgeTheNextAndBackTrack(nextQuestionId, resultMap);
+				}
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			resultMap.put("infoMsg", "9999");
+		}
+		return resultMap;
+
+	}
+
+	public Map<String, Object> getTheFirstQuestionByParam(Answers param, Map<String, Object> resultMap) {
+		Question question = answersDao.getTheFirstQuestionTypeAndId(param.getInvestigationId());
+		if (question.getQuestionType().equals(AnswerType.EDIT_TYPE_OPTION)) {
+			backTheQaqTypeQuestion(question.getQuestionId(),resultMap);
+		} else {
+			List<OptionQueryDTO> listOne = answersDao.getFirstQuestionOfQuestionNaire(param.getInvestigationId());
+			List<OptionQueryDTO> listTwo = answersDao.getFirstQuestionOfQuestionNaireMatrix(param.getInvestigationId());
+			resultMap = traverseOptionQueryList(listOne, resultMap);
+			if (listTwo.size() != 0) {
+				resultMap = traverseMatrixQueryList(listTwo, resultMap);
+			}
+		}
+		return resultMap;
+
+	}
+	
+	public void backTheQaqTypeQuestion(String questionId,Map<String,Object> resultMap){
+		Question question = answersDao.getQuestionOfQaq(questionId);
+		QuestionAppVO questionVo = new QuestionAppVO();
+		questionVo.setQstId(question.getQuestionId());
+		questionVo.setQsrId(question.getInvestigationId());
+		questionVo.setQuestionName(question.getSubject());
+		questionVo.setQuestionSeq(question.getSeq());
+		questionVo.setQuestionType(question.getQuestionType());
+		questionVo.setOptions(new ArrayList<OptionAppVO>());
+		OptionAppVO optionVO = new OptionAppVO();
+		questionVo.getOptions().add(optionVO);
+		Gson gson = new Gson();
+		resultMap.put("detail", gson.toJsonTree(questionVo));
+		resultMap.put("questMark", AnswerContants.USALLY_MARK);
+	}
+
+	/**
+	 * 保存答题答案-单题
+	 */
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public Map<String, Object> answerOne(Answers answer, String userId) {
+		Map<String, Object> returnMap = null;
+		// 如果是第一题，插入答题记录
+		operFirstQuestion(answer, userId);
+		// 保存答题项
+		answer.setUserId(userId);
+		saveOptions(answer);
+		// 根据答题选项获得下一题
+		returnMap = getNextQuestionByParam(answer);
+		// 如果是最后一题修改答题记录为答题结束
+		operLastQuestion(answer, userId);
+		return returnMap;
+	}
+
+	/**
+	 * 最后一题答题
+	 *
+	 * @param answer
+	 * @param userId
+	 */
+	@Override
+	public void operLastQuestion(Answers answer, String userId) {
+		// 如果是最后一题修改答题记录为答题结束
+		if (AnswerContants.LAST_MARK.equals(answer.getQuestMark())) {
+			// 判断是否有记录
+			if (!getAnswerRecord(answer.getInvestigationId(), userId)) {
+				// 插入值
+				addAnswerRecord(answer.getInvestigationId(), userId, AnswerContants.RECORD_ONE);
+			} else {
+				Map<String, Object> paramMap = new HashMap<String, Object>();
+				paramMap.put("investigationId", answer.getInvestigationId());
+				paramMap.put("userId", userId);
+				paramMap.put("answerStatus", "1");
+				answersDao.updaterAnswerRecordEnd(paramMap);
+			}
+
+		}
+	}
+
+	/**
+	 * 第一题答题
+	 *
+	 * @param answer
+	 * @param userId
+	 */
+	private void operFirstQuestion(Answers answer, String userId) {
+		if (AnswerContants.FIRST_MARK.equals(String.valueOf(answer.getAnswerSeq()))) {
+			// 插入答题记录，默认题目状态是0
+			// 先查询是否已经有记录
+			if (!getAnswerRecord(answer.getInvestigationId(), userId)) {
+				addAnswerRecord(answer.getInvestigationId(), userId, AnswerContants.RECORD_ZERO);
+			}
+		}
+	}
+
+	/**
+	 * 保存答题项
+	 *
+	 * @param answer
+	 */
+	private void saveOptions(Answers answer) {
+		// 0.删除用户已经保存的答案（之前回退后的答案）
+		deleteUserHasAnswer(answer);
+		// 1.获得题目的多选信息
+		String mutilateOptions = answer.getMutilateOption();
+		Gson gson = new Gson();
+		List<MutilateOption> mutilateOption = gson.fromJson(mutilateOptions, new TypeToken<List<MutilateOption>>() {
+		}.getType());
+		// 2.循环添加answer
+		if (null != mutilateOption && mutilateOption.size() > 0) {
+			for (MutilateOption options : mutilateOption) {
+				Answers ans = new Answers();
+				ans.setUserId(answer.getUserId());
+				ans.setInvestigationId(answer.getInvestigationId());
+				ans.setQuestionId(answer.getQuestionId());
+				ans.setQtype(answer.getQtype());
+				// 选项的项
+				ans.setOptionId(options.getOptionId());
+				ans.setOptionColumnId(options.getOptionColumnId());
+				ans.setScoreValue(options.getScoreValue());
+				// 多选值插入问题答案
+				answersDao.insertAnswerOne(ans);
+			}
+		} else {
+			// 如果没有多选项，保存为单选项
+			answersDao.insertAnswerOne(answer);
+		}
+		// 3.保存答题记录-question
+		insertAnswerQuestion(answer);
+	}
+
+	/**
+	 * 删除用户已经保存的答案
+	 * 
+	 * @param answer
+	 */
+	private void deleteUserHasAnswer(Answers answer) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("userId", answer.getUserId());
+		paramMap.put("investigationId", answer.getInvestigationId());
+		paramMap.put("questionId", answer.getQuestionId());
+		answersDao.deleteUserHasAnswer(paramMap);
+		;
+	}
+
+	/**
+	 * 保存答题记录-question
+	 *
+	 * @param answer
+	 */
+	private void insertAnswerQuestion(Answers answer) {
+		AnswerQuestion answerQuestion = new AnswerQuestion();
+		answerQuestion.setInvestigationId(answer.getInvestigationId());
+		answerQuestion.setQuestionId(answer.getQuestionId());
+		answerQuestion.setAnswerSeq(answer.getAnswerSeq());
+		answerQuestion.setUserId(answer.getUserId());
+		answersDao.insertAnswerQuestion(answerQuestion);
+	}
+
+	/**
+	 * description:（抽取）遍历list公共方法
+	 *
+	 * @param list
+	 * @return
+	 */
+	public Map<String, Object> traverseOptionQueryList(List<OptionQueryDTO> list, Map<String, Object> resultMap) {
+		QuestionAppVO questionVo = null;
+		String lastQstID = null;
+		OptionAppVO optionVO = null;
+		for (OptionQueryDTO optionQueryDto : list) {
+			if (!optionQueryDto.getQuestionID().equals(lastQstID)) {
+				questionVo = new QuestionAppVO();
+				questionVo.setQstId(optionQueryDto.getQuestionID());
+				questionVo.setQsrId(optionQueryDto.getInvestigationID());
+				questionVo.setQuestionName(optionQueryDto.getQuestionSubject());
+				questionVo.setQuestionSeq(optionQueryDto.getQuestionSeq());
+				questionVo.setQuestionType(optionQueryDto.getQuestionType());
+				questionVo.setOptions(new ArrayList<OptionAppVO>());
+
+				lastQstID = optionQueryDto.getQuestionID();
+			}
+			optionVO = new OptionAppVO(optionQueryDto);
+			if (StringUtils.isNotBlank(optionVO.getPath())) {
+				optionVO.setPath(perfixUrl + optionVO.getPath());
+			}
+			questionVo.getOptions().add(optionVO);
+			Gson gson = new Gson();
+			resultMap.put("detail", gson.toJsonTree(questionVo));
+			resultMap.put("questMark", AnswerContants.USALLY_MARK);
+		}
+		return resultMap;
+	}
+
+	/**
+	 * description:遍历矩阵list公共方法
+	 *
+	 * @param list
+	 * @return
+	 */
+	public Map<String, Object> traverseMatrixQueryList(List<OptionQueryDTO> list, Map<String, Object> resultMap) {
+		QuestionAppVO questionVo = null;
+		String lastQstID = null;
+		MatrixAppVO matrixVO = null;
+		for (OptionQueryDTO optionQueryDto : list) {
+			if (!optionQueryDto.getQuestionID().equals(lastQstID)) {
+				questionVo = new QuestionAppVO();
+				questionVo.setQstId(optionQueryDto.getQuestionID());
+				questionVo.setQsrId(optionQueryDto.getInvestigationID());
+				questionVo.setQuestionName(optionQueryDto.getQuestionSubject());
+				questionVo.setQuestionSeq(optionQueryDto.getQuestionSeq());
+				questionVo.setQuestionType(optionQueryDto.getQuestionType());
+				questionVo.setMatrixs(new ArrayList<MatrixAppVO>());
+
+				lastQstID = optionQueryDto.getQuestionID();
+			}
+			matrixVO = new MatrixAppVO(optionQueryDto);
+			questionVo.getMatrixs().add(matrixVO);
+			Gson gson = new Gson();
+			resultMap.put("matrix", gson.toJsonTree(questionVo));
+		}
+		return resultMap;
+	}
+
+	/**
+	 * description: （抽离）判断选项是否关联下一题并返回resultMap方法
+	 *
+	 * @param nextQuestionId
+	 * @param param
+	 * @return
+	 */
+	public Map<String, Object> judgeTheNextAndBackTrack(String nextQuestionId, Map<String, Object> resultMap) {
+		List<OptionQueryDTO> list = answersDao.getNextQuestionByParam(nextQuestionId);
+		if (list.size() != 0) {
+			resultMap = traverseOptionQueryList(list, resultMap);
+			String qtype = list.get(0).getQuestionType();
+			if (qtype.equals(AnswerType.MATRIX_RADIO_OPTION) || qtype.equals(AnswerType.MATRIX_CHECK_OPTION)) {
+				List<OptionQueryDTO> listm = answersDao.getNextQuestionMatrixByParam(nextQuestionId);
+				resultMap = traverseMatrixQueryList(listm, resultMap);
+			}
+		} else {
+			resultMap.put("questMark", AnswerContants.LAST_MARK);
+		}
+		return resultMap;
+	}
+
+	/**
+	 * 获得上一题
+	 */
+	@Override
+	public Map<String, Object> getPrevQuestion(Answers answer) {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		// 获取上一题的题目id
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("investigationId", answer.getInvestigationId());
+		paramMap.put("answerSeq", answer.getAnswerSeq());
+		paramMap.put("userId", answer.getUserId());
+		Map<String, Object> queryMap = answersDao.getQuestionIdByAnswerSeq(paramMap);
+		String questionId = null;
+		String answerSeq = null;
+		if (null != queryMap) {
+			if (null != queryMap.get("questionId")) {
+				questionId = String.valueOf(queryMap.get("questionId"));
+			}
+			if (null != queryMap.get("answerSeq")) {
+				answerSeq = String.valueOf(queryMap.get("answerSeq"));
+			}
+		}
+		if (AnswerContants.FIRST_MARK.equals(answerSeq)) {
+			getTheFirstQuestionByParam(answer, resultMap);
+		} else {
+			// 根据questionId获得问题类型
+			String qtype = answersDao.getQuestionTypeById(questionId);
+			if (AnswerType.EDIT_TYPE_OPTION.equals(qtype)) {
+				backTheQaqTypeQuestion(questionId, resultMap);
+			} else {
+				judgeTheNextAndBackTrack(questionId, resultMap);
+			}
+		}
+		// 获得当前题目的答案
+		paramMap.put("questionId", questionId);
+		getCurrentAnswer(paramMap, resultMap);
+		return resultMap;
+	}
+
+	/**
+	 * 获得当前题目的答案-answer
+	 */
+	private void getCurrentAnswer(Map<String, Object> paramMap, Map<String, Object> resultMap) {
+		// 获得当前题目的答案值
+		List<Answers> answerList = answersDao.getCurrentQuestAns(paramMap);
+		resultMap.put("answerList", answerList);
+	}
+
+	/**
+	 * 获取问卷信息
+	 *
+	 * @return
+	 */
+	@Override
+	public List<BusinvestigationDTO> getInvestigation(String userId) {
+		return answersDao.getInvestigation(userId);
+	}
+
+	@Override
+	public String getQsrComPer(String qsrId) {
+		// 获取问卷答题记录数
+		int answersCount = answersDao.getAnswerRecordCount(qsrId);
+		// 问卷实际发布数量
+		int retunCopy = 0;
+		// 获取问卷实际发布数量
+		BusinvestigationDTO dto = answersDao.getreturnCopyByqsrId(qsrId);
+		if (null != dto) {
+			retunCopy = dto.getReturnCopy();
+		}
+		String completionPercent = "0";
+		if (retunCopy != 0) {
+			completionPercent = getPercent(answersCount, retunCopy);
+		}
+		return completionPercent;
+	}
+
+}

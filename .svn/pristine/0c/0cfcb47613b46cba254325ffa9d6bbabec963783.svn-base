@@ -1,0 +1,34 @@
+package com.paic.pawj.answer.dto;
+
+
+
+import java.security.Timestamp;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@Data
+public class BusinvestigationDTO {
+	//问卷id
+	private String investigationId;	
+	private String name;	
+	private String userId;
+	private int questionNum;
+    private double coefficient;
+    private int planCopy;
+    private int returnCopy;
+    private double totalFee;
+    private double actualFee;
+    private double deductFee;
+    private Timestamp planStarTime;
+    private Timestamp planEndTime;
+	private String status;
+	private Timestamp actualStarTime;
+	private Timestamp actualEndTime;
+	private double answerFee;
+	private String brief;
+	//答题进度
+	private String qsrComPer;
+
+}

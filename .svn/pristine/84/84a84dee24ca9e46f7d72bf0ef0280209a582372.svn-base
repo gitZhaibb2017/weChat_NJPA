@@ -1,0 +1,55 @@
+//日常任务
+$(function() {
+	getRecord();
+	$("#signToday").click(function(){
+		signTody();
+	});
+});
+//日常任务
+function getRecord() {
+	getMsg();
+}
+// 获取日常任务信息
+function getMsg() {
+	$.ajax({
+		type : 'POST',
+		url : "/pawj/getCheckInPoint.do",
+		contentType : "application/json",
+		success : function(data) {
+			data = {count:"0",
+					point:"200",
+					retCode:"0000",
+					todayFlg:"false"
+				    };
+			console.log(data);
+			if(data.todayFlag=="true"){
+				$("#isSign").html("已签到");
+			}else{
+				$("#isSign").html("未签到");
+			}
+			$("#signDesc").html("连续"+data.count+"天");
+			$("#signCount").html("+"+data.point);
+			
+		}
+	});
+}
+//今日签到
+function signTody(){
+	$.ajax({
+		type : 'POST',
+		url : "/pawj/updateCheckInStatus.do",
+		contentType : "application/json",
+		success : function(data) {
+			var result =$.parseJSON(data);
+			//签到成功
+			if(result.retCode=="0000"){
+				getRecord();
+			}
+			//失败
+			else{
+				
+			}
+			
+		}
+	});
+}

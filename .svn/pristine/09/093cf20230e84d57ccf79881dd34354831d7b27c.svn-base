@@ -1,0 +1,30 @@
+package com.paic.pawj.partner.dao;
+
+import java.util.List;
+
+
+
+
+import com.paic.pawj.partner.dto.LotteryPartner;
+
+
+public interface LotteryPartnerMapper {
+
+	// 查询获奖人员信息
+	public List<LotteryPartner> queryLotteryPartnerList(LotteryPartner lotteryPartner);
+	
+	// 查询获奖人员总条数
+	public int queryLotteryPartnerCount(LotteryPartner lotteryPartner);
+	
+	// 修改获奖人员信息
+	public void updateLotteryPartner(LotteryPartner lotteryPartner);
+	
+	// 添加获奖人员信息
+	public void addLotteryPartner(LotteryPartner lotteryPartner);
+	
+	// 删除获人员奖信息
+	public void deleteLotteryPartner(String userId);
+	
+	//根据id查询抽奖人员信息
+	public int haveUserId(String userId);
+}

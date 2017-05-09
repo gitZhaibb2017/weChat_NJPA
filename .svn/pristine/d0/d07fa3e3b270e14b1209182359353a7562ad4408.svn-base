@@ -1,0 +1,9 @@
+package com.paic.pawj.basic.account.service;
+
+import com.paic.pawj.basic.account.dao.AccountQuery;
+
+public interface AccountQueryService {
+	
+	public AccountQuery queryAccountChangesByIvtg(String userID, String investigationID);
+
+}

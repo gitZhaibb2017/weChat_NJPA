@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.paic.pawj.answer.dao.AnswersMapper">
+	<insert id="saveAnswers" parameterType="com.paic.pawj.answer.dao.Answers">
+		INSERT INTO
+		pawj_sur_answers(user_id, qsr_id, qst_id, answer_type, answer_content,
+		answer_time, answer_add)
+		VALUES(#{userId}, #{qsrId}, #{qstId},
+		#{answerType}, #{answerContent}, sysdate(),
+		#{answerAdd})
+		ON DUPLICATE
+		KEY UPDATE
+		answer_type=#{answerType},answer_content=#{answerContent},answer_time=sysdate(),answer_add=#{answerAdd}
+	</insert>
+
+	<insert id="saveAnswersDraft" parameterType="com.paic.pawj.answer.dao.Answers">
+		insert into
+		pawj_sur_answers_draft (user_id, qsr_id, qst_id,
+		answer_type,answer_content,answer_time,answer_add) values (#{userId},
+		#{qsrId}, #{qstId}, #{answerType}, #{answerContent}, sysdate(),
+		#{answerAdd})
+	</insert>
+
+	<select id="queryQstnaireList" resultType="java.util.HashMap">
+		select qsr_id qsrID,
+		qsr_name qsrName,
+		qsr_status qsrStatus,
+		qsr_desc qsrDesc,
+		label label,
+		publish_time publishTime,
+		publisher publisher
+		from
+		pawj_sur_questionnaire
+	</select>
+
+	<select id="getAnswerUserCount" parameterType="java.lang.String"
+		resultType="int">
+		SELECT count(*) FROM pawj_sur_answers where question_id =
+		#{qsrId}
+	</select>
+
+	<select id="getQsrNumber" parameterType="java.lang.String"
+		resultType="java.lang.Integer">
+		select qsr_number from pawj_sur_questionnaire where qsr_id
+		= #{qsrId}
+	</select>
+
+	<select id="getUserAnswerByQsr" parameterType="com.paic.pawj.answer.dao.Answers"
+		resultType="com.paic.pawj.answer.dao.Answers">
+		select 
+			answer_id answerId,
+			question_id questionId,
+			qtype qtype,
+			option_id optionId,
+			option_column_id optionColumnId,
+			qaq_value qaqValue,
+			score_value scoreValue,
+			answer_add answerAdd,
+			created_time createdTime
+		from
+			pawj_sur_answers
+		where 
+			question_id = #{questionId}
+		and 
+			user_id = #{userId}
+	</select>
+
+	<select id="queryAnswerRecordByUser" parameterType="com.paic.pawj.answer.dao.AnswerRecord"
+		resultType="com.paic.pawj.answer.dao.AnswerRecord">
+		SELECT id,investigation_Id investigationID,user_id
+		userID,commit_time commitTime,answer_status answerStatus
+		FROM
+		pawj_sur_answers_record
+		where investigation_Id=#{investigationID}
+		and
+		user_id = #{userID}
+		and
+		answer_status = '0'
+		limit 1
+	</select>
+
+	<insert id="insertAnswerRecord" parameterType="com.paic.pawj.answer.dao.AnswerRecord">
+		insert into
+		pawj_sur_answers_record(id,
+		investigation_Id,user_id,commit_time,answer_status)
+		values (uuid(),
+		#{investigationID},#{userID},sysdate(),#{answerStatus})
+	</insert>
+
+	<!-- 保存答题选项 -->
+	<insert id="insertAnswerOne" parameterType="com.paic.pawj.answer.dao.Answers">
+		insert into
+		pawj_sur_answers
+		`answer_id` ,
+		`question_id` ,
+		`qtype` ,
+		`option_id` ,
+		`option_column_id` ,
+		`qaq_value` ,
+		`score_value` ,
+		`answer_add` ,
+		`created_time`
+		values
+		(
+		replace(uuid(),'-',''),
+		#{questionId},
+		#{qtype},
+		#{optionId},
+		#{optionColumnId},
+		#{qaqValue},
+		#{scoreValue},
+		#{answerAdd},
+		now()
+		)
+	</insert>
+	
+	<!-- 修改答题记录为完成状态 -->
+	<update id="updaterAnswerRecordEnd" parameterType="java.util.HashMap">
+		update 
+			pawj_sur_answers_record 
+		set 
+			answer_status = #{answerStatus}
+		where 
+			user_id = #{userId}
+		and 
+			investigation_Id = #{investigationId}
+	</update>
+
+	<select id="getQuestionIdByOption" parameterType="java.lang.String"
+		resultType="java.lang.String">
+		select associated_id from pawj_ivtg_question_option where
+		option_id =
+		#{optionId}
+	</select>
+
+	<select id="getNextQuestionBySequence" parameterType="java.lang.String"
+		resultType="java.lang.String">
+		SELECT
+		question_id
+		FROM
+		pawj_ivtg_question
+		WHERE
+		investigation_id = (
+		SELECT
+		investigation_id
+		FROM
+		pawj_ivtg_question
+		WHERE
+		question_id = #{questionId}
+		)
+		AND seq = (
+		SELECT
+		seq
+		FROM
+		pawj_ivtg_question
+		WHERE
+		question_id = #{questionId}
+		) + 1
+	</select>
+
+	<select id="getNextQuestionByParam" parameterType="java.lang.String"
+		resultType="com.paic.pawj.investigation.dao.OptionQueryDTO">
+		select i.investigation_id investigationID,
+		i.name
+		investigationName,
+		q.subject questionSubject,
+		q.question_type
+		questionType,
+		q.question_id
+		questionID ,
+		q.seq questionSeq,
+		o.option_id
+		optionID,
+		o.option_code
+		optionCode,
+		o.option_name optionName
+		from
+		pawj_busi_investigation
+		i,pawj_ivtg_question
+		q,pawj_ivtg_question_option o
+		where
+		i.investigation_id =
+		q.investigation_id
+		and q.question_id =
+		o.question_id
+		and q.question_id =
+		#{questionId}
+		ORDER BY seq asc,option_code asc
+	</select>
+
+	<select id="getFirstQuestionOfQuestionNaire" parameterType="java.lang.String"
+		resultType="com.paic.pawj.investigation.dao.OptionQueryDTO">
+		select i.investigation_id investigationID,
+		i.name
+		investigationName,
+		q.subject
+		questionSubject,
+		q.question_type
+		questionType,
+		q.question_id
+		questionID ,
+		q.seq questionSeq,
+		o.option_id
+		optionID,
+		o.option_code
+		optionCode,
+		o.option_name optionName
+		from
+		pawj_busi_investigation
+		i,pawj_ivtg_question
+		q,pawj_ivtg_question_option o
+		where
+		i.investigation_id =
+		q.investigation_id
+		and q.question_id =
+		o.question_id
+		and q.investigation_id =
+		#{investigationId}
+		and q.seq = '1'
+		ORDER BY optionCode ASC
+	</select>
+
+</mapper>

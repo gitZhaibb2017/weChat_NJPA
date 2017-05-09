@@ -1,0 +1,62 @@
+package com.paic.pawj.prize.dto;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+
+
+@Data
+@NoArgsConstructor
+public class LotteryPrize {
+	
+	/**
+	 * 主键
+	 */
+	private int prizeId;
+	
+	/**
+	 * 奖项名称
+	 */
+	private String prizeName;
+	
+	/**
+	 * 开始时间
+	 */
+	private String startTime;
+	
+	/**
+	 * 结束时间
+	 */
+	private String endTime;
+	
+	/**
+	 * 奖品数量
+	 */
+	private int voteNum;
+	
+	/**
+	 * 获奖人数
+	 */
+	private int winnerNum;
+	
+	/**
+	 * 状态
+	 */
+	private String status;
+	
+	/**
+	 * 级别
+	 */
+	private String level;
+	
+	/**
+	 * 
+	 */
+	private int start;
+	
+	/**
+	 * 
+	 */
+	private int pageSize;
+
+}

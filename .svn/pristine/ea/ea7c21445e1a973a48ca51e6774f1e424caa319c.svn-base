@@ -1,0 +1,15 @@
+package com.paic.pawj.home.dao;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class HpTopicalDAO {
+	private String topicalId;
+	private String qsrId;
+	private String qsrName;
+	private String seq;
+	private String qsrComPer;
+	private String answerStatus;
+}

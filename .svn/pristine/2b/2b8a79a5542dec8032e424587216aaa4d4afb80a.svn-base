@@ -1,0 +1,13 @@
+package com.paic.pawj.answer.dao;
+
+import java.util.List;
+
+public interface InvestigationCommentMapper {
+	public void addInvestigationComment(InvestigationComment invComment);
+	
+	public void addInvestigationScore(InvestigationScore invScore);
+	
+	public List<InvestigationComment> queryHottestComments();
+	
+	public int haveItvgCommentExist(InvestigationComment invComment);
+}

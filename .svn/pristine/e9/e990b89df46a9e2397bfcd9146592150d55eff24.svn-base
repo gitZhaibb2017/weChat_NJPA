@@ -1,0 +1,12 @@
+/**
+ * 
+ */
+package com.paic.pawj.test.service;
+
+/**
+ * @author happy
+ *
+ */
+public interface TestService {
+    public String getUserName(String userId);
+}

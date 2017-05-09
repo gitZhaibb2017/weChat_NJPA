@@ -1,0 +1,30 @@
+/**
+ * 
+ */
+package com.paic.pawj.common.util;
+
+/**
+ * @author admin
+ *
+ */
+public class ReturnConstants {
+	
+	public static String CODE_KEY = "retCode";
+	
+	public static String MSG_KEY = "retMsg";
+
+	/**
+	 * 未登录
+	 */
+	public static String NO_LOGGIN_CODE = "9999";
+	
+	/**
+	 * 系统异常
+	 */
+	public static String SYS_ERR_CODE = "9998";
+	
+	/**
+	 * 正常
+	 */
+	public static String NORMAL_CODE = "0000";
+}

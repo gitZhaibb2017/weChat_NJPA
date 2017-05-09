@@ -1,0 +1,34 @@
+/**
+ * 
+ */
+package com.paic.pawj.investigation.dao;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * @author admin
+ *
+ */
+@NoArgsConstructor
+@Data
+public class OptionQueryDTO {
+
+	private String investigationID;
+	
+	private String investigationName;
+	
+	private String questionID;
+	
+	private String questionSubject;
+	
+	private String questionType;
+	
+	private int questionSeq;
+	
+	private String optionID;
+	
+	private String optionCode;
+	
+	private String optionName;
+}

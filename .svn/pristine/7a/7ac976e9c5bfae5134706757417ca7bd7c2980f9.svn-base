@@ -1,0 +1,294 @@
+package com.paic.pawj.lottery.service.impl;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.google.gson.JsonObject;
+import com.paic.pawj.lottery.dao.LotteryMapper;
+import com.paic.pawj.lottery.dao.Partner;
+import com.paic.pawj.lottery.dao.Prize;
+import com.paic.pawj.lottery.dao.VoteRecord;
+import com.paic.pawj.lottery.dao.Winners;
+import com.paic.pawj.lottery.service.LotteryService;
+
+@Service
+public class LotteryServiceImpl implements LotteryService {
+	
+	private static final Logger LOGGER = Logger
+			.getLogger(LotteryServiceImpl.class);
+	
+	private static final List<Partner> ALL_PARTNERS = new ArrayList<Partner>();
+	
+	private static final List<Prize> ALL_PRIZES = new ArrayList<Prize>();
+	
+	@Resource
+	private LotteryMapper lotteryDAO;
+
+	@Override
+	@Transactional
+	public JsonObject vote(String userId) {
+		JsonObject result  = new JsonObject();
+		long time = System.currentTimeMillis();
+		LOGGER.info(userId+"[VOTE]step2: " + time);
+		Prize prize = getPrizeByTime(time);
+		LOGGER.info(userId+"[VOTE]step3: " + System.currentTimeMillis());
+		
+		List<Partner> partners = getPartners();
+		LOGGER.info(userId+"[VOTE]step4: " + System.currentTimeMillis());
+		if (null != prize && null != partners)
+		{
+			int votedIndex = (int)(time % partners.size());
+			Partner votedPartner = partners.get(votedIndex);
+			
+			VoteRecord vr = new VoteRecord();
+			vr.setPrizeID(prize.getPrizeID());
+			vr.setVotedMan(votedPartner.getUserID());
+			vr.setVoter(userId);
+			vr.setTime(new Timestamp(time));
+//			lotteryDAO.insertVoteRecord(vr);
+			result = addVoteRecord(vr, votedPartner);
+			LOGGER.info(userId+"[VOTE]step5: " + System.currentTimeMillis());
+		}
+		else 
+		{
+			result = new JsonObject();
+			result.addProperty("retCode", "8000");
+			result.addProperty("retMsg", "投票还未开始");
+		}
+		return result;
+	}
+	
+	private JsonObject addVoteRecord(VoteRecord vr, Partner votedPartner)
+	{
+		JsonObject result = new JsonObject();
+		VoteRecord voteRecord = lotteryDAO.queryVotedNumber(vr);
+		
+		int voteNumber = 1;
+		if (null != voteRecord)
+		{
+			voteNumber = voteRecord.getVoteNum() - voteRecord.getVotedNum();
+		}
+		if (voteNumber > 0){
+			lotteryDAO.insertVoteRecord(vr);
+
+			result.addProperty("retCode", "0000");
+			result.addProperty("retMsg", "投票成功");
+			result.addProperty("fileName", votedPartner.getPath());
+			result.addProperty("voteNumber", voteNumber - 1);
+		}
+		else 
+		{
+			result.addProperty("retCode", "8001");
+			result.addProperty("retMsg", "您已投过此奖项");
+		}
+		
+		return result;
+	}
+
+	@Override
+	public List<Partner> getAllPartners() {
+		return lotteryDAO.queryAllPartners();
+	}
+
+	@Override
+	public Prize getCurrentPrize() {
+		return lotteryDAO.queryCurrentPrize(new Timestamp(System.currentTimeMillis()));
+	}
+
+	@Override
+	@Transactional(rollbackFor=Exception.class)
+	public void startVote(String level) {
+		reloadPrize();
+		Prize prize = getPrizeByLevel(level);
+		getAllPartners();
+		if ("1".equals(prize.getStatus()))
+		{
+			prize.setStartTime(new Timestamp(System.currentTimeMillis()));
+			lotteryDAO.updatePrizeStart(prize);
+			reloadPrize();
+		}
+	}
+	
+	private void saveWinnersInfo(List<Partner> partners, int prizeID)
+	{
+		if (CollectionUtils.isNotEmpty(partners))
+		{
+			Winners winners = new Winners();
+			winners.setPrizeID(prizeID);
+			winners.setPartners(new ArrayList<String>());
+			for (Partner p : partners)
+			{
+				winners.getPartners().add(p.getUserID());
+			}
+			lotteryDAO.updatePartnerPrize(winners);
+		}
+	}
+
+	@Override
+	@Transactional()
+	public List<Partner> stopVote(String level) {
+		Prize prize = getPrizeByLevel(level);
+		prize.setEndTime(new Timestamp(System.currentTimeMillis()));
+		lotteryDAO.updatePrizeEnd(prize);
+		
+		
+		List<Partner> winners = lotteryDAO.selectWinerByPrize(prize.getPrizeID());
+//		List<Partner> winners = new ArrayList<Partner>();
+//		Partner lastPartner = null;
+//		for (Partner p : list)
+//		{
+//			if (null != lastPartner && p.getVotedNum() < lastPartner.getVotedNum()
+//					&& winners.size() > prize.getWinnerNum()) 
+//			{
+//				break;
+//			}
+//			winners.add(p);
+//			lastPartner = p;
+//		}
+		
+		List<Partner> lastWinners = new ArrayList<Partner>();
+		if (winners.size() > prize.getWinnerNum())
+		{
+			int lastVotedNum = winners.get(prize.getWinnerNum()).getVotedNum();
+			for(Partner winner : winners)
+			{
+				if (winner.getVotedNum() > lastVotedNum)
+				{
+					winner.setWin(true);
+					lastWinners.add(winner);
+				}
+			}
+		} 
+		else 
+		{
+			lastWinners = winners;
+		}
+		
+		saveWinnersInfo(lastWinners, prize.getPrizeID());
+		
+		if (prize.getWinnerNum() > lastWinners.size())
+		{
+			Prize newPrize = new Prize();
+			newPrize.setPrizeID(prize.getPrizeID() + 1);
+			newPrize.setPrizeName(prize.getPrizeName());
+			newPrize.setVoteNum(prize.getVoteNum());
+			newPrize.setWinnerNum(prize.getWinnerNum() - lastWinners.size());
+			newPrize.setStartTime(new Timestamp(0));
+			newPrize.setEndTime(new Timestamp(0));
+			newPrize.setLevel(prize.getLevel());
+			newPrize.setStatus("1");
+			lotteryDAO.insertPrize(newPrize);
+			ALL_PRIZES.add(newPrize);
+		}
+		
+		for (Partner p : lastWinners)
+		{
+			deletePartner(p.getUserID());
+		}
+		reloadPrize();
+		return winners;
+	}
+	
+	private List<Partner> getPartners()
+	{
+		if (ALL_PARTNERS.size() == 0)
+		{
+			List<Partner> partners = lotteryDAO.queryAllPartners();
+			for (Partner partner : partners)
+			{
+				ALL_PARTNERS.add(partner);
+			}
+		}
+		return ALL_PARTNERS;
+	}
+	
+	private void deletePartner(String userID)
+	{
+		if (ALL_PARTNERS.size() > 0)
+		{
+			Partner tmp = null;
+			for (Partner partner : ALL_PARTNERS)
+			{
+				if (partner.getUserID().equals(userID))
+				{
+					tmp = partner;
+					break;
+				}
+			}
+			ALL_PARTNERS.remove(tmp);
+		}
+	}
+	
+	private List<Prize> getPrizes()
+	{
+		if (ALL_PRIZES.size() == 0)
+		{
+		    List<Prize> list = lotteryDAO.queryAllPrize();
+		    for (Prize prize : list)
+		    {
+		    	ALL_PRIZES.add(prize);
+		    }
+		}
+		
+		return ALL_PRIZES;
+	}
+	
+	private Prize getPrizeByTime(long now)
+	{
+		List<Prize> prizes = getPrizes();
+		Prize result = null;
+		for (Prize prize : prizes)
+		{
+			if (now < prize.getEnd() && now > prize.getStart())
+			{
+				result = prize;
+				break;
+			}
+		}
+		
+		return result;
+	}
+	
+	private Prize getPrizeByLevel(String level)
+	{
+		List<Prize> prizes = getPrizes();
+		Prize result = null;
+		for (Prize prize : prizes)
+		{
+			if (prize.getLevel().equals(level))
+			{
+				result = prize;
+				break;
+			}
+		}
+		
+		return result;
+	}
+	
+	private void reloadPrize()
+	{
+		ALL_PRIZES.clear();
+		getPrizes();
+	}
+	
+	private void reloadPartner()
+	{
+		ALL_PARTNERS.clear();
+		getPartners();
+	}
+
+	@Override
+	public void reload() {
+		reloadPrize();
+		reloadPartner();
+	}
+
+}

@@ -1,0 +1,18 @@
+package com.paic.pawj.basic.account.dao;
+
+public interface AccountChangeInfoMapper {
+	public AccountChangeInfo queryAccountChangesByIvtg(String ivtgID);
+
+	public void insertAccountBalance(AccountChangeInfo accountChange);
+	
+	public void insertAccountPoint(AccountChangeInfo accountChange);
+	
+	public void updateAccountInfo(AccountChangeInfo accountChange);
+	/**
+	 * 获取用户积分和余额信息
+	 * @param accountChange
+	 * @return
+	 */
+	public AccountChangeInfo getAccountInfo(AccountChangeInfo accountChange);
+	
+}

@@ -1,0 +1,24 @@
+package com.paic.pawj.basic.user.common.contants;
+
+
+public class UserInfoContants {
+	
+	// 消息
+	public static final String MSG = "msg";
+	
+	// 失败
+	public static final String UPDATE_FAIL = "0";
+	
+	// 成功
+	public static final String UPDATE_SUCC = "1";
+	
+	// 失败
+	public static final String UPdate_SAME = "2";
+	
+	// 头像保存的文件夹
+	public static final String HEAD_PIC_PATH = "headpic";
+	
+	//个人信息修改白名单
+	public static final String WHITELIST = "name,nickName,sex,profession,mobile,email";
+
+}

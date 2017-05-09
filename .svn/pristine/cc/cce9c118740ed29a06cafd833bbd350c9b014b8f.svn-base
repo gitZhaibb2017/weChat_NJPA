@@ -1,0 +1,99 @@
+package com.paic.pawj.answer.service.impl;
+
+import java.sql.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.paic.pawj.answer.controller.vo.CommentVO;
+import com.paic.pawj.answer.controller.vo.InvestigationCommentVO;
+import com.paic.pawj.answer.dao.InvestigationComment;
+import com.paic.pawj.answer.dao.InvestigationCommentMapper;
+import com.paic.pawj.answer.dao.InvestigationScore;
+import com.paic.pawj.answer.service.InvestigationCommentAppService;
+import com.paic.pawj.basic.comment.dao.Comment;
+import com.paic.pawj.basic.comment.dao.CommentMapper;
+
+@Service
+public class InvestigationCommentAppServiceImpl implements InvestigationCommentAppService {
+
+	@Resource
+	private CommentMapper commentDAO;
+	
+	@Resource
+	private InvestigationCommentMapper investigationCommentDAO;
+	
+	@Override
+	@Transactional
+	public void saveInvestigationComment(
+			InvestigationCommentVO invCommentVO)
+	{
+		String newComment = null;
+		InvestigationComment  invComment = null;
+		String tmpID = null;
+		for (CommentVO cVO : invCommentVO.getComments()){
+			tmpID = cVO.getCommentID();
+			if (StringUtils.isBlank(tmpID)){
+				newComment = cVO.getComment();
+				tmpID = String.valueOf(saveBasicComent(newComment, invCommentVO));
+			}
+			
+			invComment = new InvestigationComment();
+			invComment.setInvestigationID(invCommentVO.getQsrId());
+			invComment.setAnswerer(invCommentVO.getAnswerer());
+			invComment.setCommentID(Integer.parseInt(tmpID));
+			invComment.setCreateTime(new Date(System.currentTimeMillis()));
+			
+			investigationCommentDAO.addInvestigationComment(invComment); 
+		}
+
+		saveInvestigationScore(invCommentVO);
+	}
+	
+	private int saveBasicComent(
+			String newComment, InvestigationCommentVO invCommentVO)
+	{
+		int commentID = 0;
+		if (StringUtils.isNotBlank(newComment)){
+			Comment comment = new Comment();
+			comment.setComment(newComment);
+
+			Comment sameComment = commentDAO.getSameComment(comment);
+			if (null != sameComment)
+			{
+				commentID = sameComment.getCommentId();
+			}
+			else 
+			{
+				comment.setStatus("1");
+				comment.setCommentType("ivtg");
+				comment.setPublisher(invCommentVO.getAnswerer());
+				comment.setCreateTime(new Date(System.currentTimeMillis()));
+				commentDAO.saveComment(comment);
+				commentID = comment.getCommentId();
+			}
+		}
+		
+		return commentID;
+	}
+	
+	private void saveInvestigationScore(InvestigationCommentVO invCommentVO)
+	{
+		InvestigationScore investigationScore = new InvestigationScore();
+		investigationScore.setAnswerer(invCommentVO.getAnswerer());
+		investigationScore.setInvestigationID(invCommentVO.getQsrId());
+		investigationScore.setScore(invCommentVO.getScore());
+		
+		investigationCommentDAO.addInvestigationScore(investigationScore);
+	}
+
+	@Override
+	public List<InvestigationComment> queryHottestComments() {
+		return investigationCommentDAO.queryHottestComments();
+	}
+
+}

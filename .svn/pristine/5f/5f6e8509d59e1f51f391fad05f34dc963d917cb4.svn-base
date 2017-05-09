@@ -1,0 +1,491 @@
+/**
+ * 
+ */
+package com.paic.pawj.auth.service.impl;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.google.gson.JsonObject;
+import com.paic.pawj.auth.common.contants.AuthContants;
+import com.paic.pawj.auth.dao.Auth;
+import com.paic.pawj.auth.dao.AuthMapper;
+import com.paic.pawj.auth.service.AuthService;
+import com.paic.pawj.basic.grade.service.GradeService;
+import com.paic.pawj.basic.redis.RedisClient;
+import com.paic.pawj.basic.redis.RedisConstants;
+import com.paic.pawj.basic.user.common.contants.UserInfoContants;
+import com.paic.pawj.basic.user.dao.User;
+import com.paic.pawj.basic.user.dto.UserInfo;
+import com.paic.pawj.common.util.CommonUtil;
+import com.taobao.api.DefaultTaobaoClient;
+import com.taobao.api.TaobaoClient;
+import com.taobao.api.domain.BizResult;
+import com.taobao.api.request.AlibabaAliqinFcSmsNumSendRequest;
+import com.taobao.api.response.AlibabaAliqinFcSmsNumSendResponse;
+
+/**
+ * Description:AuthService实现类
+ * 
+ * @author pc1
+ * @version
+ */
+@Service("authService")
+public class AuthServiceImpl implements AuthService {
+	
+	/**
+	 * log
+	 */
+	private static final Log LOG = LogFactory.getLog(AuthServiceImpl.class);
+	
+	/**
+	 * 日期格式化
+	 */
+	private SimpleDateFormat sdf = new SimpleDateFormat(AuthContants.FORMATE_STR);
+
+	@Resource
+	private AuthMapper authDao;
+	
+	@Autowired
+    private GradeService gradeService;
+
+	/**
+	 * 上传文件返回前缀路径
+	 */
+	@Value("${pawj.defaultIcon}")
+	private String defaultIcon;
+	
+	/**
+	 * 默认头像
+	 */
+	@Value("${pawj.perfixUrl}")
+	private String perfixUrl;
+	
+	@Autowired
+	private RedisClient redisClient;
+
+	@Override
+	public UserInfo login(Auth auth) {
+		String loginName = auth.getLoginName();
+		if (null == loginName) {
+			return null;
+		}
+		// 判断登陆的方式，获得userId
+		auth.setUserId(getUserIdByUserName(loginName));
+		// 登录校验
+		UserInfo userInfo = authDao.login(auth);
+		if (null != userInfo) {
+			// 返回的头像提示是全路径
+			String filePath = userInfo.getPicturePath();
+			if (StringUtils.isEmpty(filePath)) {
+				userInfo.setPicturePath(perfixUrl + AuthContants.FILE_SEPARATOR + defaultIcon);
+			} else {
+				userInfo.setPicturePath(perfixUrl + AuthContants.FILE_SEPARATOR + filePath);
+			}
+			// 设置登录信息
+			authDao.loginInfo(auth);
+			// 设置最近登录时间
+			Map<String, Object> paramMap = new HashMap<String, Object>();
+			paramMap.put("userId", userInfo.getUserId());
+			authDao.recentLoginTime(paramMap);
+			userInfo.setToken(saveToken(userInfo));
+			// 登陆成功后，根据升级策略升级
+			gradeService.setUserGrade(userInfo);
+		}
+		return userInfo;
+	}
+	
+	/**
+	 * 根据auth userId的格式判断是什么账号登陆的
+	 * @param auth
+	 */
+	private String getUserIdByUserName(String loginName) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		// 转换为具体的mobile或email
+		tranferUserName(loginName, paramMap);
+		return getUserId(paramMap);
+	}
+
+	/**
+	 * 获得userId
+	 * @param userId
+	 * @param paramMap
+	 * @return
+	 */
+	private String getUserId(Map<String, Object> paramMap) {
+		String userId = null;
+		// 获得转换后的userId
+		Map<String, Object> resultMap = authDao.queryUserId(paramMap);
+		if (null != resultMap && null != resultMap.get("userId")) {
+			userId = (String)resultMap.get("userId");
+		}
+		return userId;
+	}
+
+	/**
+	 * 转换loginName成具体的mobile、email和userName
+	 * @param userNameOld
+	 * @param paramMap
+	 */
+	private String tranferUserName(String loginName,
+			Map<String, Object> paramMap) {
+		String returnFlag = null;
+		// 匹配值
+		if (checkRegExp(AuthContants.REGEXP_MOBILE, loginName)) {
+			// 1.手机号码登录方式
+			paramMap.put("mobile", loginName);
+		} else if (checkRegExp(AuthContants.REGEXP_EMAIL, loginName)) {
+			// 2.邮箱登录方式
+			paramMap.put("email", loginName);
+		} else {
+			// 3.userName登录方式
+			if (!checkRegExp(AuthContants.REGEXP_USERNAME, loginName)) {
+				// 账户格式不正确，返回提示信息
+				returnFlag = AuthContants.REGISTER_ILLEGAL;
+			}
+			paramMap.put("userName", loginName);
+		}
+		return returnFlag;
+	}
+	
+	/**
+	 * 注册时转换userName为具体的mobile、email
+	 * @param userName
+	 * @param user
+	 */
+	private void tranferUserName2(User user) {
+		String loginName = user.getLoginName();
+		// 匹配值
+		if (checkRegExp(AuthContants.REGEXP_MOBILE, loginName)) {
+			// 1.手机号码登录方式
+			user.setMobile(loginName);
+		} else if (checkRegExp(AuthContants.REGEXP_EMAIL, loginName)) {
+			// 2.邮箱登录方式
+			user.setEmail(loginName);
+		} else if (checkRegExp(AuthContants.REGEXP_USERNAME, loginName)){
+			// 3.userName登录方式
+			user.setUserName(loginName);
+		} 
+	}
+	
+	/**
+	 * 校验登录方式
+	 */
+	private boolean checkRegExp(String regExp, String value) {
+		Pattern pattern = Pattern.compile(regExp);
+		Matcher matcher = pattern.matcher(value);
+		return matcher.matches();
+	}
+	
+	@Override
+	public String register(User user) {
+		// return flag
+		String returnFlag = null;
+		// 转换为mobile、email
+		tranferUserName2(user);
+		// 注册新增用户
+		addUser(user);
+		returnFlag = AuthContants.REGISTER_SUCC;
+		return returnFlag;
+	}
+
+	/**
+	 * 注册新增用户
+	 * @param user
+	 */
+	private void addUser(User user) {
+		UserInfo fo = new UserInfo();
+		if (StringUtils.isEmpty(user.getUserId())) {
+			user.setUserId(CommonUtil.getUUID());
+		}
+		fo.setUserId(user.getUserId());
+		fo.setPicturePath(defaultIcon);
+		authDao.register(user);
+		// 设置初始化等级==1
+		fo.setGrade(1);
+		insertInfo(fo);
+		authDao.insertAccount(fo);
+	}
+
+	public String checkToken(String token) {
+		String newToken = null;
+		String tokenKey = RedisConstants.APP_TOKEN_PIX + token;
+		String number = redisClient.get(tokenKey);
+		if (StringUtils.isNotBlank(number)) {
+			newToken = token;
+			Long time = redisClient.pttl(tokenKey);
+			if (time < 5 * 24 * 3600 * 1000) {
+				newToken = UUID.randomUUID().toString();
+				tokenKey = RedisConstants.APP_TOKEN_PIX + newToken;
+				redisClient.set(tokenKey, number);
+				redisClient.expire(tokenKey, 7 * 24 * 3600);
+				redisClient.del(RedisConstants.APP_TOKEN_PIX + token);
+			}
+		}
+		return newToken;
+	}
+
+	@Override
+	public String saveToken(UserInfo user) {
+		String token = UUID.randomUUID().toString();
+		JsonObject json = new JsonObject();
+		json.addProperty("userId", user.getUserId());
+		json.addProperty("userName", user.getUserName());
+		redisClient.set(RedisConstants.APP_TOKEN_PIX + token, json.toString());
+		redisClient.expire(RedisConstants.APP_TOKEN_PIX + token, 7 * 24 * 3600);
+		return token;
+	}
+
+	private void insertInfo(UserInfo fo) {
+		authDao.insertUserInfo(fo);
+	}
+
+//	@Transactional(rollbackFor = Exception.class)
+//	@Override
+//	public String inviteCode(String inviteCode, String userId) {
+//		// return "0":不可用，"1":可用
+//		String returnMsg = AuthContants.INVITE_CODE_ILLEGAL;
+//		Map<String, Object> paramMap = new HashMap<String, Object>();
+//		paramMap.put("inviteCode", inviteCode);
+//		paramMap.put("userId", userId);
+//		// 查询邀请码是否可以用
+//		int cnt = authDao.checkInviteCode(paramMap);
+//		if (cnt > AuthContants.CNT_ZERO) {
+//			// 邀请码可用
+//			// 使用邀请码
+//			authDao.useInviteCode(paramMap);
+//			// 查询userId是否入库，用于判断邀请码是否可用
+//			cnt = authDao.checkInviteCodeUsed(paramMap);
+//			if (cnt > AuthContants.CNT_ZERO) {
+//				returnMsg = AuthContants.INVITE_CODE_LEGAL;
+//			}
+//		}
+//		return returnMsg;
+//	}
+
+	@Override
+	public Map<String, Object> validateUserName(String loginName) {
+		Map<String, Object> returnMap = new HashMap<String, Object>();
+		if (StringUtils.isEmpty(loginName)) {
+			returnMap.put("infoMsg", AuthContants.REGISTER_NULL);
+		} else {
+			// 验证格式是否正确
+			Map<String, Object> paramMap = new HashMap<String, Object>();
+			String validateUserName = tranferUserName(loginName, paramMap);
+			if (null != validateUserName) {
+				// 校验不通过userName
+				returnMap.put("infoMsg", validateUserName);
+			}else {
+				String userId = getUserId(paramMap);
+				if (null != userId) {
+					returnMap.put("infoMsg", AuthContants.USER_ID_EXIST);
+				}else {
+					// 生产uuid作为userId
+					returnMap.put("infoMsg", AuthContants.REGISTER_VALIDATE_SUCC);
+					returnMap.put("userId", CommonUtil.getUUID());
+				}
+			}
+		}
+		return returnMap;
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public Map<String, Object> register4Wechat(String wechatId, String mobile) {
+		// return 
+		Map<String, Object> returnMap = new HashMap<String, Object>();
+		// param
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		// 1.校验手机号码
+		if (!checkRegExp(AuthContants.REGEXP_MOBILE, mobile)) {
+			returnMap.put("infoMsg", AuthContants.MOBILE_ILLEGAL);
+			return returnMap;
+		}
+		// 2.校验手机号码是否注册
+		// paramMobile
+		Map<String, Object> paramMobileMap = new HashMap<String, Object>();
+		paramMobileMap.put("mobile", mobile);
+		int cnt = authDao.queryMoblieHasRegister(paramMobileMap);
+		if (cnt > 0) {
+			returnMap.put("infoMsg", AuthContants.MOBILE_ID_EXIST);
+			return returnMap;
+		}
+		
+		// 3.校验weChatId是否已经注册
+		paramMap.put("wechatId", wechatId);
+		String userId = getUserId(paramMap);
+		if (null != userId) {
+			returnMap.put("infoMsg", AuthContants.WECHAT_ID_EXIST);
+		}else {
+			// 校验邀请码+注册
+//			checkInviteAndRegister(wechatId, mobile, inviteCode, returnMap);
+			// 保存、修改微信id
+			saveWechat(wechatId, mobile, paramMobileMap, returnMap);
+		} 
+		return returnMap;
+	}
+
+	/**
+	 * 保存
+	 * @param wechatId
+	 * @param paramMobileMap
+	 * @param user
+	 */
+	private void saveWechat(String wechatId, String mobile, Map<String, Object> paramMobileMap, Map<String, Object> returnMap) {
+		String userId = null;
+		// 判定手机号是否存在，微信WeChatId不存在
+		userId = getUserId(paramMobileMap);
+		if (null != userId) {
+			// 修改用户信息
+			// paramUserIdMap
+			Map<String, Object> paramUserIdMap = new HashMap<String, Object>();
+			paramUserIdMap.put("userId", userId);
+			paramUserIdMap.put("wechatId", wechatId);
+			authDao.updateWechatId(paramUserIdMap);
+		} else {
+			// 生产uuid作为userId
+			userId = CommonUtil.getUUID();
+			User user = new User();
+			user.setUserId(userId);
+			user.setWechatId(wechatId);
+			user.setMobile(mobile);
+			// 生成默认密码
+			user.setPwd(CommonUtil.shaEncrypt(AuthContants.DEFAULT_PWD));
+			// 新增用户
+			addUser(user);
+		}
+		// 注册成功后，获得用户userId
+		returnMap.put("userInfo", userId);
+		returnMap.put("infoMsg", AuthContants.REGISTER4WECHAT_SUCC);
+	}
+
+	/**
+	 * 获得校验码
+	 */
+	@Override
+	public String getCheckCode(String mobile) {
+		//短信模板的内容  
+		String code = getCode();
+		String json="{\"code\":\"" + code + "\", \"time\":\"" + AuthContants.TIME + "\"}";  
+		TaobaoClient client = new DefaultTaobaoClient(AuthContants.URL, AuthContants.APPKEY, AuthContants.SECRET);  
+		AlibabaAliqinFcSmsNumSendRequest req = new AlibabaAliqinFcSmsNumSendRequest();  
+		req.setSmsType(AuthContants.NORMAL);  
+		req.setSmsFreeSignName(AuthContants.SIGN_NAME);  
+		req.setSmsParamString(json);  
+		req.setRecNum(mobile);  
+		req.setSmsTemplateCode(AuthContants.TEMPLENT_SMS);  
+		String resultCode = "1";
+		try {  
+			AlibabaAliqinFcSmsNumSendResponse rsp = client.execute(req);
+			BizResult rest = rsp.getResult();
+			resultCode = rest.getErrCode();
+			LOG.info("发送验证码，阿里返回信息：" + resultCode);
+			if (rest.getSuccess()) {
+				// 短信发送成功，保持数据库
+				insertCheckCode(mobile, code);
+			}
+		} catch (Exception e) {  
+			LOG.info("发送验证码失败，失败原因：", e);
+		}
+		return resultCode;
+	}
+
+	/**
+	 * 插入短息验证码
+	 * @param code
+	 */
+	private void insertCheckCode(String mobile, String code) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("checkCode", code);
+		paramMap.put("sendTime", sdf.format(new Date()));
+		paramMap.put("mobile", mobile);
+		authDao.insertCheckCode(paramMap);
+	}
+
+	
+	/**
+	 * 获得验证码-随机数字
+	 * @return
+	 */
+	private String getCode() {
+		return String.valueOf(CommonUtil.getRandNum(AuthContants.MIN, AuthContants.MAX));
+	}
+
+	/**
+	 * 检查校验码
+	 */
+	@Override
+	public boolean checkCode(String mobile, String checkCode) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("checkCode", checkCode);
+		paramMap.put("checkTime", sdf.format(new Date()));
+		paramMap.put("minute", AuthContants.TIME);
+		paramMap.put("mobile", mobile);
+		boolean resultFlag = false;
+		if (authDao.checkCode(paramMap) > 0){
+			resultFlag = true;
+			// 校验码可用
+			authDao.useCheckCode(paramMap);
+		}
+		return resultFlag;
+	}
+
+	
+//	/**
+//	 * 校验邀请码+注册
+//	 * @param wechatId
+//	 * @param mobile
+//	 * @param inviteCode
+//	 * @param returnMap
+//	 * @param userId
+//	 */
+//	private void checkInviteAndRegister(String wechatId, String mobile,
+//			String inviteCode, Map<String, Object> returnMap) {
+//		// 生产uuid作为userId
+//		String userIdNew = CommonUtil.getUUID();
+//		// 校验邀请码
+//		String checkInvite = inviteCode(inviteCode, userIdNew);
+//		if (AuthContants.INVITE_CODE_ILLEGAL.equals(checkInvite)) {
+//			// 邀请码不可用
+//			returnMap.put("infoMsg", AuthContants.INVITE_CODE_ILLEGAL);
+//		} else {
+//			// 可用，注册
+//			User user = new User();
+//			user.setUserId(userIdNew);
+//			user.setWechatId(wechatId);
+//			user.setMobile(mobile);
+//			// 生成默认密码
+//			user.setPwd(CommonUtil.shaEncrypt(AuthContants.DEFAULT_PWD));
+//			addUser(user);
+//			returnMap.put("infoMsg", AuthContants.REGISTER4WECHAT_SUCC);
+//		}
+//	}
+
+	/**
+	 * 上传图片文件
+	 */
+	@Override
+	public String uploadFile(String baseUrl, String fileName, byte[] fileContent) {
+		String filePath = baseUrl + File.separator + AuthContants.CHOICE_PIC_PATH;
+		String fileName_ = CommonUtil.getUUID() + AuthContants.UNDERSCODE + fileName;
+		String filePathName = AuthContants.CHOICE_PIC_PATH + File.separator + fileName_;
+		CommonUtil.getFile(fileContent, filePath, fileName_);
+		return filePathName;
+	}
+}

@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>匿名评价</title>
+<link href="../../css/main.css" rel="stylesheet"
+	media="screen and (max-width: 320px)" />
+<link href="../../css/main.css" rel="stylesheet"
+	media="screen and (min-width: 321px) and (max-width: 640px)" />
+<link href="../../css/main.css" rel="stylesheet"
+	media="screen and (min-width: 641px) and (max-width: 2560px)" />
+	<link href="../../css/popup.css" rel="stylesheet"
+	media="screen and (max-width: 2560px)" />
+</head>
+<script type="text/javascript" src="../../../libs/easyui/zepto.js"></script>
+<script type="text/javascript" src="../../js/answer/comment.js"></script>
+<script type="text/javascript" src="../../js/common/validate_h5.js"></script>
+<script type="text/javascript" src="../../js/personInfo/popup.js"></script>
+<body class="bgWhite">
+	<header>
+		<i onclick="commBack()"></i><span>匿名评价</span>
+	</header> 
+
+	<div class="evaluteTitle">
+		<h1>
+			<span class="star" onClick="starChose('1')"id="star1" value="1"></span>
+			<span class="star" onClick="starChose('2')"id="star2" value="2"></span>
+			<span class="star" onClick="starChose('3')"id="star3" value="3"></span>
+			<span class="star" onClick="starChose('4')"id="star4" value="4"></span>
+			<span class="star" onClick="starChose('5')"id="star5" value="5"></span>
+			<input id="commentValue" type="radio" style="display: none;">
+		</h1>
+	</div>
+
+	<div class="evaluteMark">
+		<h1>您对本问卷的印象是：</h1>
+		<ul id="comQa">
+		</ul>
+		<div>
+			<textarea placeholder="请输入你的印象，不超过20字" id="placeholder"></textarea>
+		</div>
+	</div>
+
+	<div class="evaluteMarkBtn">
+		<button onclick="sub()">提交</button>
+	</div>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript" src="/pawj/libs/easyui/jquery.min.js"></script>
+<script type="text/javascript"
+	src="/pawj/libs/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript"
+	src="/pawj/libs/easyui/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="/pawj/prize/js/prize.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="/pawj/libs/easyui/themes/default/easyui.css" />
+<link rel="stylesheet" type="text/css"
+	href="/pawj/libs/easyui/themes/icon.css" />
+<title>奖项管理</title>
+</head>
+<body>
+	<!-- 奖项添加 -->
+	<div id="loginInfoAdd" icon="icon-save"
+		style="padding: 5px; width: 500px; height: 400px; top: 100px;">
+		<h5 id="loginInfoAdd_message" style="color: red;"></h5>
+		<div class="ToolTip_Form" id="table_loginInfoAdd"
+			onkeydown="if(event.keyCode==13){loginInfoAdd();}">
+			<input type="hidden" id="questionInfoId"></input>
+			<table>
+				<tr>
+					<td><label>奖项名称：</label></td>
+					<td><input type="text" class="easyui-validatebox"
+						id="prizeName" maxlength="20" ></input></td>
+				</tr>
+				<tr>
+					<td><label>开始时间：</label></td>
+					<td><input class="easyui-datetimebox" id="startTime"
+						style="width: 150px"><span>&nbsp;~&nbsp;</span>
+						<label>结束时间:</label>
+						<input
+						class="easyui-datetimebox" id="endTimePlan" style="width: 150px"></td>
+				</tr>
+				<tr>
+					<td><label>奖项数量：</label></td>
+					<td><input type="text" class="easyui-validatebox"
+						id="voteNum" maxlength="20" ></input></td>
+				</tr>
+				<tr>
+					<td><label>获奖人数量：</label></td>
+					<td><input class="easyui-validatebox" id="winnerNum"
+						></input></td>
+				</tr>
+				<tr>
+					<td><label>问卷状态：</label></td>
+					<td><select id="status" class="easyui-combobox">
+							<option value="1">正常</option>
+							<option value="2">已完成</option>
+							<option value="3">弃用</option>
+						</select></td>
+				</tr>
+				<tr>
+					<td><label>级别:</label></td>
+					<td><input type="text" class="easyui-validatebox" 
+					id = "level" maxlength="10"/></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><a href="#" class="easyui-linkbutton" icon="icon-ok"
+						onclick="prizeAdd();">提交</a> <a href="#"
+						class="easyui-linkbutton" icon="icon-redo"
+						onclick="prizeAddReset();">重置</a></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</body>
+</html>

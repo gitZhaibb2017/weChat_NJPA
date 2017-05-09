@@ -1,0 +1,26 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"
+	pageEncoding="utf-8"%>
+<!DOCTYPE html>
+<html class="bgWhite">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<title>调查内容</title>
+<link href="/pawj/wxapp/css/main.css" rel="stylesheet"
+	media="screen and (max-width: 320px)" />
+<link href="/pawj/wxapp/css/main.css" rel="stylesheet"
+	media="screen and (min-width: 321px) and (max-width: 640px)" />
+<link href="/pawj/wxapp/css/main.css" rel="stylesheet"
+	media="screen and (min-width: 641px) and (max-width: 2560px)" />
+<script type="text/javascript" src="/pawj/libs/easyui/zepto.js"></script>
+</head>
+<header>
+	<i onclick="javascript:window.history.back();"></i><span>答题</span>
+</header>
+<body class="bgWhite" >
+<section class="qaContext">
+	<h1>该问卷已参与过，请参与其他问卷。</h1>
+</section>
+</body>
+</html>

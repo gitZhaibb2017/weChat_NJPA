@@ -1,0 +1,25 @@
+/*
+ * 
+ */
+package com.paic.pawj.auth.dao;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * 
+ * @author admin
+ *
+ */
+@NoArgsConstructor
+@Data
+public class Admin {
+
+	private String userId;
+	
+	private String name;
+	
+	private String role;
+	
+	private String pdd;
+}

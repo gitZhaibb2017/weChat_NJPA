@@ -1,0 +1,13 @@
+package com.paic.pawj.home.dao;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class HpRollingDAO {
+	private String name;
+	private int location;
+	private String picPath;
+	private String forwardUrl;
+}

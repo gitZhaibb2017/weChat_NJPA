@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>平安科技2017南京年会</title>
+<link href="../../css/main.css" rel="stylesheet"
+	media="screen and (max-width: 320px)" />
+<link href="../../css/main.css" rel="stylesheet"
+	media="screen and (min-width: 321px) and (max-width: 640px)" />
+<link href="../../css/main.css" rel="stylesheet"
+	media="screen and (min-width: 641px) and (max-width: 2560px)" />
+<script type="text/javascript" src="../../../libs/easyui/zepto.js"></script>
+<script type="text/javascript" src="../../js/common/common.js"></script>
+<script type="text/javascript" src="../../js/task.js"></script>
+
+</head>
+
+<body class="bgGray">
+	<header>
+		<i></i><span>日常任务</span>
+	</header>
+
+	<section class="taskContextSign">
+		<table>
+			<tr>
+				<td><img src="../../images/icon_chencin_status.png" /></td>
+				<td><img src="../../images/icon_checkin_point.png" /></td>
+				<td><img src="../../images/icon_conchenckin.png" /></td>
+			</tr>
+			<tr>
+				<td><span id="isSign"></span></td>
+				<td><span id="signCount"></span></td>
+				<td><span id="signDesc"></span></td>
+			</tr>
+			<tr>
+				<td colspan="3"><img src="../../images/btn_checkin.png" id="signToday"/></td>
+			</tr>
+		</table>
+	</section>
+	<section class="taskContext">
+	<img src="../../images/icon_survey.png" />
+	</section>
+	<section class="taskContext">
+	<img src="../../images/icon_newbie_task.png" />
+	</section>
+
+
+	<footer></footer>
+</body>
+</html>

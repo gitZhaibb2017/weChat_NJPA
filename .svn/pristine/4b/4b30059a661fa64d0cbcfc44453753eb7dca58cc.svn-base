@@ -1,0 +1,79 @@
+package com.paic.pawj.report.controller;
+
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.paic.pawj.basic.interceptor.SessionUserInfo;
+import com.paic.pawj.report.dto.ReportDTO;
+import com.paic.pawj.report.dto.ReportVoteDTO;
+import com.paic.pawj.report.service.ReportService;
+
+@Controller
+@RequestMapping("/report/")
+public class ReportController {
+
+	/**
+	 * log
+	 */
+	private static final Log LOG = LogFactory.getLog(ReportController.class);
+
+	@Autowired
+	private ReportService reportService;
+	
+	/**
+	 * 查询微报告
+	 * @param page
+	 * @param rows
+	 * @param reportDTO
+	 * @return
+	 */
+	@RequestMapping("queryReportList.do")
+	@ResponseBody
+	public Map<String, Object> queryReportList(@RequestParam("page") int page, @RequestParam("rows") int rows,
+			ReportDTO reportDTO) {
+		// 返回参数map
+		Map<String, Object> returnMap = null;
+		try {
+			reportDTO.setStart((page - 1) * rows);
+			reportDTO.setPageSize(rows);
+			returnMap = reportService.queryReportList(reportDTO);
+		} catch (Exception e) {
+			LOG.error("查询微报告失败，失败原因：", e);
+		}
+		// return
+		return returnMap;
+	}
+	
+	/**
+	 * 微报告投票
+	 * @param page
+	 * @param rows
+	 * @param reportDTO
+	 * @return
+	 */
+	@RequestMapping("voteReport.do")
+	@ResponseBody
+	public Map<String, Object> voteReport(ReportVoteDTO reportVoteDTO,HttpSession session) {
+		// 返回参数map
+		Map<String, Object> returnMap = null;
+		SessionUserInfo suser = (SessionUserInfo) session
+				.getAttribute(SessionUserInfo.SESSION_ID);
+		reportVoteDTO.setUserId(suser.getUserId());
+		try {
+			returnMap = reportService.voteReport(reportVoteDTO);
+		} catch (Exception e) {
+			LOG.error("查询微报告投票失败，失败原因：", e);
+		}
+		// return
+		return returnMap;
+	}
+}

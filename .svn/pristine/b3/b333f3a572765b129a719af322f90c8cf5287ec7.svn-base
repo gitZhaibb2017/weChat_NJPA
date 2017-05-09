@@ -1,0 +1,5 @@
+package com.paic.pawj.basic.comment.service;
+
+public class CommentService {
+
+}

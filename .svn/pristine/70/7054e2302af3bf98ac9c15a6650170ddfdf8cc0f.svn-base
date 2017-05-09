@@ -1,0 +1,293 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" import="java.util.UUID"
+	pageEncoding="utf-8"%>
+<%
+	String invId= request.getParameter("qsrId");
+	System.out.println("invId="+invId);
+	String needInsert = "false";
+	if("".equals(invId)){
+		invId=UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
+		needInsert="true";
+	}
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script type="text/javascript" src="/pawj/libs/easyui/jquery.min.js"></script>
+<script type="text/javascript"
+	src="/pawj/libs/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript"
+	src="/pawj/libs/easyui/locale/easyui-lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="/pawj/libs/easyui/themes/default/easyui.css" />
+<link rel="stylesheet" type="text/css"
+	href="/pawj/libs/easyui/themes/icon.css" />
+<title>Insert title here</title>
+<script type="text/javascript">
+var tipbase = false;
+var tipques = false;
+var isRequestingBase = false;
+var isRequestingQues = false;
+var i=1;
+var fisrtSave = <%=needInsert%>;
+function setHeight(){
+	i++;
+	if(i == 3){
+		i=0;
+	}
+	$("#questionList").prop("height",450+i);
+}
+
+function saveInvInfos(){
+	tipbase = false;
+	tipques = false;
+	isRequestingBase = false;
+	isRequestingQues = true;
+	if(!validBase()){
+		return;
+	}
+	saveBaseInfo();
+	var obj=document.getElementById("questionList").contentWindow;
+	var ifmObj=obj.document.getElementById("saveButton");
+	ifmObj.click();
+}
+
+function validBase(){
+	var isValid = true;
+
+	$('#table_loginInfoAdd input').each(function() {
+		if ($(this).attr('required') || $(this).attr('validType')) {
+			$(this).validatebox('enableValidation');
+			if (!$(this).validatebox('isValid')) {
+				// 如果验证不通过，则返回false
+				isValid = false;
+				return false;
+			}
+		}
+	});
+	if (!isValid) {
+		$.messager.alert('警告', "请输入必输字段！", 'warning');
+		$('#contextBox').accordion("select",0);
+		return false;
+	}
+	return true;
+}
+
+function saveBaseInfo(){
+	if(!validBase()){
+		return;
+	}
+	isRequestingBase = true;
+	$.ajax({
+		async : false,
+		cache : false,
+		type : 'POST',
+		dataType : "json",
+		data : {
+			"investigationId" : $("#questionInfoId").val(),
+			"name" : $("#wjinfo_name").val(),
+			"userId" : $("#wjinfo_auth").val(),
+			"brief" : $("#wjinfo_desc").val(),
+			"planCopy" : $("#wjinfo_copies").val(),
+			"answerFee" : $("#wjinfo_answer_fee").val(),
+			"coefficient" : $("#wjinfo_xishu").val(),
+			"planStartTime" : $("#startTimePlan").datetimebox("getValue"),
+			"planEndTime" : $("#endTimePlan").datetimebox("getValue"),
+			"status" : $("#wj_status").combobox('getValue'),
+			"isAdd" : fisrtSave
+		},
+		url : '/pawj/investigation/saveInvestigation.do',// 请求的action路径
+		error : function() {// 请求失败处理函数
+			alert('请求失败');
+		},
+		success : function(data) {
+			tipbase = true;
+			fisrtSave="false";
+			isRequestingBase = false;
+			alertMessage()
+			window.parent.reloadTable();
+		}
+	});
+}
+function alertMessage(){
+
+	if (!isRequestingBase && !isRequestingQues) {
+			if (tipbase && !tipques) {
+				$.messager.alert('提示', "问卷基本信息保存成功!", 'info');
+			} else if (!tipbase && tipques) {
+				$.messager.alert('提示', "问卷问题保存成功!", 'info');
+			} else if (tipbase && tipques) {
+				$.messager.alert('提示', "问卷基本信息和问题保存成功!", 'info');
+			}
+			tipbase = false;
+			tipques = false;
+		}
+}
+function alertSth(msg){
+	$.messager.alert('提示', msg, 'info');
+}
+	function closeWindow() {
+		tipques = true;
+		isRequestingQues = false;
+		alertMessage();
+	}
+	function openQuestionMan(){
+		$('#contextBox').accordion("select",1);
+		tipbase = false;
+		tipques = false;
+		isRequestingBase = false;
+		isRequestingQues = false;
+	}
+	$(function() {
+		$('#contextBox').accordion({
+			onSelect : function(title, index) {
+				if (index == 1) {
+					setTimeout("setHeight()", 100);
+				}
+			}
+		});
+
+		$.ajax({
+			async : false,
+			cache : false,
+			type : 'POST',
+			dataType : "json",
+			url : '/pawj/investigation/queryInvestigation.do',// 请求的action路径
+			data : {
+				"investigationId" : '<%=invId%>',
+				page:1,
+				rows:1
+			},
+			error : function() {// 请求失败处理函数
+				alert('请求失败');
+			},
+			success : function(data) {
+				if(data.rows.length==0){
+					$('input.easyui-validatebox').validatebox('disableValidation')// ////////
+					.focus(function() {
+						$(this).validatebox('enableValidation');
+					}).blur(function() {
+						$(this).validatebox('validate')
+					});
+					$('#wj_status').combobox({
+						url : '/pawj/common/queryDic.do?dicCode=qsrStatus',
+						valueField : 'dicValue',
+						textField : 'dicDesc',
+						width : '85px',
+						panelHeight : 'auto',
+						editable : false,
+						onChange : function(record) {
+							// console.log(record);
+						},
+						onLoadSuccess : function() {
+							$('#wj_status').combobox("setValue", "1");
+						}
+					});
+					return;
+				}
+				var row=data.rows[0];
+				$("#wjinfo_name").val(row.name);
+				$("#wjinfo_auth").val(row.userId);
+				$("#wjinfo_desc").val(row.brief);
+				$("#wjinfo_copies").val(row.planCopy);
+				$("#wjinfo_answer_fee").val(row.answerFee);
+				$("#wjinfo_xishu").val(row.coefficient);
+				$("#startTimePlan").datetimebox('setValue', row.planStartTime);
+				$("#endTimePlan").datetimebox('setValue', row.planEndTime);
+				$('input.easyui-validatebox').validatebox('disableValidation')// ////////
+				.focus(function() {
+					$(this).validatebox('enableValidation');
+				}).blur(function() {
+					$(this).validatebox('validate')
+				});
+
+				$('#wj_status').combobox({
+					url : '/pawj/common/queryDic.do?dicCode=qsrStatus',
+					valueField : 'dicValue',
+					textField : 'dicDesc',
+					width : '85px',
+					panelHeight : 'auto',
+					editable : false,
+					onChange : function(record) {
+						// console.log(record);
+					},
+					onLoadSuccess : function() {
+						$('#wj_status').combobox("setValue", parseInt(row.status));
+					}
+				});
+			}
+		});
+		$("#questionList").prop("src",
+		'/pawj/wjadd/myQuestionWindow.jsp?qsrId=<%=invId%>');
+	});
+</script>
+</head>
+<body>
+	<div class="easyui-accordion" id="contextBox" border="false">
+		<!-- selected -->
+		<div title="问卷基本信息" selected="true">
+			<!-- 添加 -->
+			<div id="loginInfoAdd" icon="icon-save"
+				style="padding: 5px; height: 295px; top: 100px;">
+				<h5 id="loginInfoAdd_message" style="color: red;"></h5>
+				<div class="ToolTip_Form" id="table_loginInfoAdd"
+					onkeydown="if(event.keyCode==13){loginInfoAdd();}">
+					<input type="hidden" id="questionInfoId" value="<%=invId%>"></input>
+					<table>
+						<tr>
+							<td><label>问卷名称：</label></td>
+							<td><input type="text" class="easyui-validatebox"
+								id="wjinfo_name" maxlength="20" required="true"></input></td>
+						</tr>
+						<tr>
+							<td><label>发布者：</label></td>
+							<td><input type="text" class="easyui-validatebox"
+								id="wjinfo_auth" maxlength="20" required="true"></input></td>
+						</tr>
+						<tr>
+							<td><label>问卷简介：</label></td>
+							<td><textarea class="easyui-validatebox" id="wjinfo_desc"
+									rows="5" cols="40"></textarea></td>
+						</tr>
+						<tr>
+							<td><label>预计份数：</label></td>
+							<td><input type="number" class="easyui-validatebox"
+								id="wjinfo_copies" maxlength="10" required="true"></input></td>
+						</tr>
+						<tr>
+							<td><label>回答回报：</label></td>
+							<td><input type="number" class="easyui-validatebox"
+								id="wjinfo_answer_fee" maxlength="10" required="true"></input></td>
+						</tr>
+						<tr>
+							<td><label>系数：</label></td>
+							<td><input type="number" class="easyui-validatebox"
+								id="wjinfo_xishu" maxlength="10" required="true"></input></td>
+						</tr>
+						<tr>
+							<td><label>计划时间：</label></td>
+							<td><input class="easyui-datetimebox" id="startTimePlan"
+								style="width: 150px"><span>&nbsp;~&nbsp;</span><input
+								class="easyui-datetimebox" id="endTimePlan" style="width: 150px"></td>
+						</tr>
+						<tr>
+							<td><label>问卷状态：</label></td>
+							<td><select id="wj_status"></select></td>
+						</tr>
+					</table>
+				</div>
+				<a href="javascript:void(0)" class="easyui-linkbutton"
+			onclick="saveBaseInfo()" icon="icon-save" style="float: right">保存问卷</a>
+			</div>
+		</div>
+		<div title="问题管理" style="overflow: auto">
+			<iframe id="questionList" width="100%" height="450" frameborder="0"
+				scrolling="auto"></iframe>
+		</div>
+	</div>
+	<div>
+		<a href="javascript:void(0)" class="easyui-linkbutton"
+			onclick="saveInvInfos()" icon="icon-save" style="float: right">保存所有</a>
+	</div>
+</body>
+</html>

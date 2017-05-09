@@ -1,0 +1,12 @@
+package com.paic.pawj.investigation.service;
+
+import java.util.List;
+
+import com.paic.pawj.investigation.controller.vo.InvestigationAppVO;
+import com.paic.pawj.investigation.dao.AnswererInvestigation;
+
+public interface InvestigationAppService {
+	public InvestigationAppVO investigationDetails(String investigationID,String userID);
+	
+	public List<AnswererInvestigation> newInvestigationPage(AnswererInvestigation queryInfo);
+}

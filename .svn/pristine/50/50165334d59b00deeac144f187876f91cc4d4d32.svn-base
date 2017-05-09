@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.paic.pawj.investigation.dao.InvestigationMapper">
+	<select id="queryInvestigationList" parameterType="com.paic.pawj.investigation.dao.Investigation"
+		resultType="com.paic.pawj.investigation.dao.Investigation">
+	SELECT
+		t_inv.investigation_id investigationId,
+		t_inv.name `name`,
+		t_inv.user_id userId,
+		t_inv.question_num questionNum,
+		t_inv.coefficient coefficient,
+		t_inv.plan_copy planCopy,
+		t_inv.return_copy returnCopy,
+		t_inv.total_fee totalFee,
+		t_inv.actual_fee actualFee,
+		t_inv.deduct_fee deductFee,
+		date_format(t_inv.plan_start_time,'%Y-%m-%d %H:%i:%s') planStartTime,
+		date_format(t_inv.plan_end_time,'%Y-%m-%d %H:%i:%s') planEndTime,
+		t_inv.status `status`,
+		t_detail.dic_desc statusDesc,
+		date_format(t_inv.actual_start_time,'%Y-%m-%d %H:%i:%s') actualStartTime,
+		date_format(t_inv.actual_end_time,'%Y-%m-%d %H:%i:%s') actualEndTime,
+		t_inv.answer_fee answerFee,
+		t_inv.brief brief
+		FROM
+		`pawj_busi_investigation` t_inv,pawj_basic_dictionary_detail t_detail where t_inv.status=t_detail.dic_value and t_detail.dic_code='qsrStatus'
+		<if test="name != null">
+			and t_inv.name like concat('%',#{name},'%') 
+		</if>
+		<if test="brief != null">
+			and t_inv.brief like concat('%',#{brief},'%') 
+		</if>
+		<if test="userId != null">
+			and t_inv.user_id like concat('%',#{userId},'%') 
+		</if>
+		<if test="investigationId != null">
+			and t_inv.investigation_id like concat('%',#{investigationId},'%') 
+		</if>
+		limit #{start},#{pageSize}
+	</select>
+	<select id="queryInvestigationCount" parameterType="com.paic.pawj.investigation.dao.Investigation"
+		resultType="int">
+		SELECT
+		count(1)
+		FROM
+		`pawj_busi_investigation` where 1=1
+		<if test="name != null">
+			and `name` like concat('%',#{name},'%') 
+		</if>
+		<if test="brief != null">
+			and brief like concat('%',#{brief},'%') 
+		</if>
+		<if test="userId != null">
+			and user_id like concat('%',#{userId},'%') 
+		</if>
+		<if test="investigationId != null">
+			and investigation_id like concat('%',#{investigationId},'%') 
+		</if>
+	</select>
+	<insert id="saveInvestigation" parameterType="com.paic.pawj.investigation.dao.Investigation">
+		INSERT INTO
+		`pawj`.`pawj_busi_investigation` (`investigation_id`, `name`,
+		`user_id`, `question_num`, `coefficient`, `plan_copy`, `return_copy`,
+		`total_fee`, `actual_fee`, `deduct_fee`, `plan_start_time`,
+		`plan_end_time`, `status`, `actual_start_time`, `actual_end_time`,
+		`answer_fee`, `brief`) VALUES (#{investigationId}, #{name}, #{userId},
+		#{questionNum}, #{coefficient}, #{planCopy}, #{returnCopy},
+		#{totalFee}, #{actualFee},#{deductFee},
+		#{planStartTime},#{planEndTime}, #{status}, #{actualStartTime},
+		#{actualEndTime}, #{answerFee}, #{brief});
+	</insert>
+	<delete id="deleteQuestionInfo" parameterType="string">
+		delete from pawj_ivtg_question_option 
+		where question_id in (select question_id from pawj_ivtg_question  where investigation_id = #{investigationId});
+		delete from pawj_ivtg_question where investigation_id = #{investigationId};
+	</delete>
+	<insert id="saveQuestion" parameterType="java.util.List">
+		INSERT INTO `pawj`.`pawj_ivtg_question` (`question_id`, `investigation_id`, `subject`, `question_type`, `display_order`, `create_time`, `update_time`, `seq`) VALUES 
+		<foreach collection="list" item="item" index="index" separator="," > 
+			(#{item.questionId}, #{item.investigationId}, #{item.subject}, #{item.questionType},#{item.displayOrder}, #{item.createTime}, #{item.updateTime}, #{item.seq})
+		</foreach> 
+	</insert>
+	<insert id="saveQuestionOption" parameterType="java.util.List">
+		INSERT INTO `pawj`.`pawj_ivtg_question_option` (`option_id`, `question_id`, `option_code`, `option_desc`, `option_name`, `display_order`, `path`) VALUES 
+		<foreach collection="list" item="item" index="index" separator="," > 
+			(#{item.optionId}, #{item.questionId}, #{item.optionCode}, #{item.optionDesc}, #{item.optionName}, #{item.displayOrder} ,#{item.path})
+		</foreach>
+	</insert>
+	<update id="updateInvestigation" parameterType="com.paic.pawj.investigation.dao.Investigation">
+		update
+		pawj_busi_investigation set
+		name=#{name},user_id=#{userId},coefficient=#{coefficient},
+		plan_copy=#{planCopy},brief=#{brief},answer_fee=#{answerFee},status=#{status},plan_start_time=#{planStartTime},
+		plan_end_time=#{planEndTime}
+		where investigation_id = #{investigationId}
+	</update>
+	<sql id="listStr">
+	    where investigation_id in ( <foreach collection="list" item="item" separator=",">#{item}
+		</foreach> )
+	</sql>
+	<delete id="deleteQuestion" parameterType="java.util.List">
+		delete from pawj_busi_investigation  <include refid="listStr" />;
+		delete from pawj_ivtg_question_option 
+		where question_id in (select question_id from pawj_ivtg_question <include refid="listStr" />);
+		delete from pawj_ivtg_question <include refid="listStr" />;
+	</delete>
+	<select id="getInvestigationQuestionList" parameterType="string"
+		resultType="com.paic.pawj.investigation.dao.Question">
+		SELECT
+			pawj_ivtg_question.question_id AS questionId,
+			pawj_ivtg_question.investigation_id AS investigationId,
+			pawj_ivtg_question.`subject` AS `subject`,
+			pawj_ivtg_question.question_type AS questionType,
+			pawj_ivtg_question.display_order AS displayOrder,
+			date_format(pawj_ivtg_question.create_time,'%Y-%m-%d %H:%i:%s') AS createTime,
+			date_format(pawj_ivtg_question.update_time,'%Y-%m-%d %H:%i:%s') AS updateTime,
+			pawj_ivtg_question.seq AS seq
+		FROM `pawj_ivtg_question` where investigation_id = #{investigationId} order by pawj_ivtg_question.seq
+	</select>
+	<select id="getInvestigationQuestionOptionList" parameterType="string"
+		resultType="com.paic.pawj.investigation.dao.QuestionOption">
+		SELECT
+			t_option.option_id AS optionId,
+			t_option.question_id AS questionId,
+			t_option.option_code AS optionCode,
+			t_option.option_desc AS optionDesc,
+			t_option.option_name AS optionName,
+			t_option.display_order AS displayOrder,
+			t_option.path AS path
+			FROM
+			pawj_ivtg_question_option AS t_option where t_option.question_id in (SELECT
+			pawj_ivtg_question.question_id AS questionId
+		FROM `pawj_ivtg_question` where investigation_id = #{investigationId}) order by t_option.display_order,t_option.option_code
+	</select>
+	<update id="updateInvestigationQuestionNum" parameterType="string">
+		update pawj_busi_investigation set question_num= (select count(1) from pawj_ivtg_question t where investigation_id=#{investigationId}) where investigation_id=#{investigationId}
+	</update>
+
+</mapper>

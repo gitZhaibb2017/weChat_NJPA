@@ -1,0 +1,7 @@
+//获取余额信息
+$(function() {
+});
+
+function goBack(){
+	window.history.back();
+};

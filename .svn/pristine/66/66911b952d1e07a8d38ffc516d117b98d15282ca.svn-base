@@ -1,0 +1,23 @@
+package com.paic.pawj.home.dao;
+
+import java.util.List;
+import java.util.Map;
+
+public interface HomeMapper {
+	public List<HpRollingDAO> getHomeAd(Map<String, Object> map);
+
+	public HpReportDAO getHomeReport();
+
+	public List<HpTopicalDAO> getHpTopical(String userId);
+
+	public int getCheckInStatus(Map<String, Object> paramMap);
+
+	public void updateCheckInPoint(Map<String, Object> paramMap);
+
+	public void insertCheckInData(Map<String, Object> paramMap);
+
+	public String getUserIcon(String userId);
+
+	public List<String> getContinuousCIDate(Map<String, Object> paramMap);
+
+}

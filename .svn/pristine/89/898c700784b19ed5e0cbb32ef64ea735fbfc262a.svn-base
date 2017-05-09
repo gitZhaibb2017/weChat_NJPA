@@ -1,0 +1,15 @@
+/**
+ * 
+ */
+package com.paic.pawj.investigation.dao;
+
+import java.util.List;
+
+/**
+ * @author admin
+ *
+ */
+public interface QuestionMapper {
+
+	List<Question> insertQuestion(Question question);
+}

@@ -1,0 +1,39 @@
+package com.paic.pawj.investigationVue.dao;
+
+import java.util.List;
+
+public interface IvtgBaseFormVueMapper {
+	public int saveIvtgBaseFormVue(IvtgBaseFormVue ivtgBaseFormVue);
+	
+	public int saveQuestionsDataVue(QuestionsDataVueDto questionsDataVue);
+	
+	public int saveOptionItem(List<OptionItem> optionItem);
+	
+	public int saveOptionItemColumn(List<OptionColumnItem> optionItemColumn);
+	
+	public IvtgBaseFormVue getInvestigationById(String investigationId);
+	
+	
+	
+	/**
+	 * 根据问卷id获取问卷问题列表信息
+	 * @param investigationId 问卷id
+	 * @return
+	 */
+	public List<QuestionsDataVue> getQuestionListById(String investigationId);
+	
+	/**
+	 * 根据问题id获取问题选项信
+	 * @param questionsId 问题id
+	 * @return
+	 */
+	public List<OptionItem> getQuestionOptionListById(String questionsId);
+	/**
+	 * 根据问题id获取问题选项列集合信息 
+	 * @param questionsId 问题id
+	 * @return
+	 */
+	public List<OptionColumnItem> getOptionMatrixListById(String questionsId);
+	
+	
+}

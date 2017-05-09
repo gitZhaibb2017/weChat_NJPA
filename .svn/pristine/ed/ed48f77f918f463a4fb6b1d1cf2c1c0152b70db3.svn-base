@@ -1,0 +1,19 @@
+package com.paic.pawj.answer.controller.vo;
+
+import java.util.List;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@Data
+public class InvestigationCommentVO {
+	private String qsrId;
+	
+	private double score;
+	
+	private List<CommentVO> comments;
+	
+	private String answerer;
+	
+}

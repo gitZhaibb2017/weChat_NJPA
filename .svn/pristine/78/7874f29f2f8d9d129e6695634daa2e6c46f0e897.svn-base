@@ -1,0 +1,147 @@
+/**
+ * 
+ */
+$(function(){
+	init();
+});
+
+function init(){
+	refershGrid();
+}
+
+	function query(){
+	$('#userinfo').datagrid({
+		url : "/pawj/userinfo/userInfo.do",
+		toolbar: '#toolbar',
+		pagination : true,
+		pageSize : 10,
+		pageList : [ 10, 20, 30 ],
+		fit : false,// 充满整个页面
+		resizable : true,// 可调整大小
+		singleSelect : true,// 只允许单选
+		fitColumns : false,// 充满整个列，列比较多的话，建议false
+		nowrap : false,// 当一个列中的字符比较多的时候。自动换行
+		rownumbers : true,// 第一列显示行号++++++++++++		border : false,// 边框
+		remoteSort : false,// 后台进行排序
+		idField : 'fOrderId',// 尽量设置唯一主键
+		onLoadSuccess : function(data) {
+		
+		},
+		onLoadError : function(data) {
+			$.messager.alert('警告', '获取数据失败,请稍后再试..', 'error');
+		},
+		columns: [[
+			{
+			field: 'picturePath',
+			title: '图片路径',
+			width: 100,
+			sortable: true,
+			align: 'center',
+			hidden: true
+			},
+			{
+			field: 'name',
+			title: '全名',
+			width: 100,
+			sortable: true,
+			align: 'center',
+			hidden: false
+			},
+			{
+			field: 'nickName',
+			title: '昵称',
+			width: 100,
+			sortable: true,
+			align: 'center',
+			hidden: false
+			},
+			{
+			field: 'sex',
+			title: '性别',
+			width: 100,
+			sortable: true,
+			align: 'center',
+			hidden: false
+			},
+			{
+			field: 'profession',
+			title: '职业',
+			width: 100,
+			sortable: true,
+			align: 'center',
+			hidden: false
+			},
+			{
+			field: 'status',
+			title: '状态',
+			width: 100,
+			sortable: true,
+			align: 'center',
+			hidden: false
+			},
+			{
+			field: 'mobile',
+			title: '手机号',
+			width: 100,
+			sortable: true,
+			align: 'center',
+			hidden: true
+			}
+			]],
+			onRowContextMenu : function(e, rowIndex, rowData) {
+				e.preventDefault();
+				$(this).datagrid('unselectAll');
+				$(this).datagrid('selectRow', rowIndex);
+				$('#menu').menu('show', {
+					left : e.pageX,
+					top : e.pageY
+				});
+			}
+		});
+}
+	/*function query(){
+		alert("1111111111111");
+		
+		
+		
+	}*/
+
+/*	//查询方法
+		 $('#query').form('submit', {
+         url: '/pawj/userinfo/userInfo.do',
+         success: function(data) {
+             var d = $.parseJSON(data);
+             if (d.success == true) {
+            	 $('#adduser').dialog('close');
+                 $.messager.show({
+                	  msg:'保存成功！',
+		              timeout:3000,
+		              showType:'slide',
+		              title: '提示'
+                 });
+                 $('#datagrid').datagrid('reload');
+             } else {
+                 $.messager.alert('提示', '提交失败！', 'warning');
+             }
+         }
+     });*/
+/*
+	function query(){;
+		//var user = $('#username').val();
+		$.ajax({
+			type:'get',
+			cache:false,
+			asyne:false,
+			url:'/pawj/userinfo/userInfo.do',
+			data:{userId: '1',
+				  pwd: '12345'	},
+			dataType:'json',
+			success:function(data){
+				user: data.userId
+			}
+		});
+	}*/
+
+function loginOut(){
+	alert(123);
+}

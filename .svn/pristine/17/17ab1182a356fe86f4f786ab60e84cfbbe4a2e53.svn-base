@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>余额提现</title>
+<link href="../../css/main.css" rel="stylesheet" media="screen and (max-width: 320px)" />  
+<link href="../../css/main.css" rel="stylesheet" media="screen and (min-width: 321px) and (max-width: 640px)" />  
+<link href="../../css/main.css" rel="stylesheet" media="screen and (min-width: 641px) and (max-width: 2560px)" /> 
+<script type="text/javascript" src="../../../libs/easyui/zepto.js"></script>
+<script type="text/javascript" src="../../js/withDraw.js"></script>
+</head>
+
+<body>
+<header><i id="goBack" onClick="goBack()"></i><span>余额提现</span></header>
+
+<div class="backgroundWhite">
+	<div class="withDraw01">
+		<span>支付宝账号</span>
+		<span><input value="1231231231" disabled></span>
+	</div>
+    <div class="withDraw02"><a id="balance">提取金额</a></div>
+</div>
+
+
+<div class="withDraw03">
+	<label class="withDrawLabel"></label>
+	<input type="text" placeholder="当前可提取余额1250.0元">
+	<a class="withDrawA">全部提取</a>
+</div>
+<div class="withDraw04" onclick="withDraw()">
+	<button>提取</button>
+</div>
+
+</body>
+</html>

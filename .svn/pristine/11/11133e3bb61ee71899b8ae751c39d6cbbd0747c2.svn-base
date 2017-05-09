@@ -1,0 +1,12 @@
+package com.paic.pawj.answer.service;
+
+import java.util.List;
+
+import com.paic.pawj.answer.dao.InvestigationComment;
+import com.paic.pawj.answer.vo.InvestigationCommentVO;
+
+public interface InvestigationCommentAppService {
+	public void saveInvestigationComment(InvestigationCommentVO invCommentVO);
+
+	public List<InvestigationComment> queryHottestComments();
+}

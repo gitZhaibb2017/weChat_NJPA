@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>平安科技2017南京年会</title>
+<link href="../../css/main.css" rel="stylesheet" media="screen and (max-width: 320px)" />  
+<link href="../../css/main.css" rel="stylesheet" media="screen and (min-width: 321px) and (max-width: 640px)" />  
+<link href="../../css/main.css" rel="stylesheet" media="screen and (min-width: 641px) and (max-width: 2560px)" /> 
+<script type="text/javascript" src="/pawj/libs/easyui/zepto.js"></script>
+<script type="text/javascript" src="../../js/account.js"></script>
+</head>
+<body class="bgWhite">
+<header><span>报告</span></header>
+<a href="../../lottery/lottery.html"><img src="../../images/bannerLottery.png" class="banner" /></a>
+<ul class="nav">
+	<li><a href="../answer/conference.html"><img src="../../images/icon_papers.png" /><i>问卷</i></a></li>
+	<li><a href="#account.html"><img src="../../images/icon_account.png" /><i class="navChoose">我的账户</i></a></li>
+	<li><a href="record.html"><img src="../../images/icon_record.png" /><i>答题记录</i></a></li>
+</ul>
+<table width="100%" border="0" cellspacing="0" cellpadding="0"  class="personContent">
+  <tr>
+    <td>
+    	<a>
+        	<span><img src="../../images/icon_wealth.png" /></span>
+        	<label><b >财富榜</b>当前排名第<i id="treasure"></i></label>
+        </a>
+    </td>
+    <td>
+    	<a>
+        	<span><img src="../../images/icon_integral.png" /></span>
+        	<label><b >积分</b><i id="points"></i>积分</label>
+        </a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+    	<a>
+        	<span><img src="../../images/icon_balance.png" /></span>
+        	<label><b >余额</b><i id="balance"></i>元</label>
+        </a>
+    </td>
+    <td>
+    	<a>
+        	<span><img src="../../images/icon_grade.png" /></span>
+        	<label><b >等级</b><i id="level"></i></label>
+        </a>
+    </td>
+  </tr>
+</table>
+<ul class="personList mt0"> 
+    <li><a href="mySearch.html"><span>我的调查</span><label><img src="../../images/icon_open.png" /></label></a></li>
+    <li><a href="record.html"><span>答题记录</span><label><img src="../../images/icon_open.png" /></label></a></li>
+    <li><a href="task.html"><span>日常任务</span><label><img src="../../images/icon_open.png" /></label></a></li>
+</ul>
+<ul class="footer">
+		<li><a href="../homePage/index.html"><img src="../../images/icon_home.png" /></a><b><a>首页</a></b></li>
+		<li><a href="../answer/conference.html"><img src="../../images/icon_interlocution.png" /><b>问答</b></a></li>
+		<li><a href="#account.html"><img src="../../images/icon_reportOn.png" /><b style="color: rgb(257,77,77)">报告</b></a></li>
+		<li><a href="../perInfo/personInfor.html"><img src="../../images/icon_me.png" /><b>我</b></a></li>
+	</ul>
+</body>
+</html>

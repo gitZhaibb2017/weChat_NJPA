@@ -1,0 +1,12 @@
+package com.paic.pawj.home.dao;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class HpReportDAO {
+	private String reportId;
+	private String reportName;
+	private String reportContent;
+}

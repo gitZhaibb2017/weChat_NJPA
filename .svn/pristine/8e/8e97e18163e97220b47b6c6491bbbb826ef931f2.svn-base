@@ -1,0 +1,19 @@
+/**
+ * 
+ */
+package com.paic.pawj.answer.dao;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class ResultCommon {
+
+	private String code;
+
+	private String message;
+
+	private String trackId;
+
+}

@@ -1,0 +1,219 @@
+body,p,h1,h2,h3,h4{
+	padding: 0;
+	margin: 0;
+	overflow: hidden;
+	font-family: "微软雅黑";
+}
+a{
+	text-decoration: none;
+}
+@keyframes move
+{
+    0% {top: 160px;}
+    50% {top: 180px;}
+    100% {top: 160px;}
+}
+@keyframes rotate
+{
+    0% {transform:rotateY(0deg);}
+    50% {transform:rotateY(180deg);}
+    100% {transform:rotateY(360deg);}
+}
+@keyframes gold
+{
+   	0% {bottom: 0px;}
+    5% {bottom: -50px;}
+    10% {bottom: -100px;}
+    15% {bottom: -150px;}
+    20% {bottom: -200px;}
+    
+    25% {bottom: -250px;}
+    30% {bottom: -300px;}
+    35% {bottom: -350px;}
+    40% {bottom: -400px;}
+    45% {bottom: -450px;}
+    
+    
+    50% {bottom: -500px;}
+    55% {bottom: -550px;}
+    60% {bottom: -600px;}
+    65% {bottom: -650px;}
+    70% {bottom: -700px;}
+    
+    75% {bottom: -750px;}
+    80% {bottom: -800px;}
+    85% {bottom: -850px;}
+    90% {bottom: -900px;}
+    95% {bottom: -950px;}
+    
+    100% {bottom: -1000px;}
+}
+.contain{
+	width: 1024px;
+	height: 768px;
+	margin: 0 auto;
+	background: url(../img/bg.jpg) no-repeat;
+	position: relative;
+}
+.title{
+	position: absolute;
+	cursor: pointer;
+	width: 350px;
+	height: 250px;
+	background: url(../img/title.png) no-repeat;
+	left: 450px;
+	top: 160px;
+	animation: move 2s;
+	animation-iteration-count: infinite;
+}
+.title:hover{
+	position: relative;
+	animation: rotate 2s;
+}
+.btn{
+	position: absolute;
+	bottom: 50px;
+	right: 40px;
+	width: 144px;
+	height: 144px;
+	z-index: 6;
+}
+.btn-start{
+	background: url(../img/btn-start.png) no-repeat;
+}
+.btn-start:hover{
+	background: url(../img/btn-start-hover.png) no-repeat;
+}
+.btn-start-down{
+	background: url(../img/btn-start-down.png) no-repeat;
+}
+.btn-end{
+	background: url(../img/btn-end.png) no-repeat;
+}
+.btn-end:hover{
+	background: url(../img/btn-end-hover.png) no-repeat;
+}
+.btn-end-down{
+	background: url(../img/btn-end-down.png) no-repeat;
+}
+.prize{
+	position: absolute;
+	width: 958px;
+	height: 400px;
+	animation: move 2s;
+	animation-iteration-count: infinite;
+	margin: -40px 0 0 0;
+	display: none;
+}
+.first-prize{
+	background: url(../img/1.png) no-repeat;
+	right: 40px;
+}
+.two-prize{
+	background: url(../img/2.png) no-repeat;
+	right: 20px;
+}
+.three-prize{
+	background: url(../img/3.png) no-repeat;
+	right: -50px;
+}
+.four-prize{
+	background: url(../img/4.png) no-repeat;
+    right: 20px;
+}
+.five-prize1{
+	background: url(../img/5-1.png) no-repeat;
+	right: -30px;
+}
+.five-prize2{
+	background: url(../img/5-2.png) no-repeat;
+	right: -30px;
+}
+.gold{
+	width: 1024px;
+	height: 1818px;
+	background: url(../img/gold.png) no-repeat;
+	display: none;
+	position: absolute;
+	animation: gold 2s;
+	animation-iteration-count: infinite;
+	z-index: 5;
+}
+.mark{
+	display: none;
+	background: #000;
+	opacity: 0.5;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 7;
+}
+.winner{
+	display: none;
+	margin: 0 auto;
+	width: 863px;
+	height: 294px;
+	background: url(../img/winner.png) no-repeat;
+	position: absolute;
+	top: 50px;
+	left: 80px;
+	z-index: 8;
+}
+.winner-list{
+	display: none;
+	width: 630px;
+	border: 8px solid #f00001;
+	background: #f7e89a;
+	position: absolute;
+	top: 108px;
+	left: 186px;
+	z-index: 8;
+}
+.winner-list h1{
+	text-align: center;
+	font-weight: bold;
+	font-size: 40px;
+	background: red;
+	color: #FFD700;
+	width: 400px;
+	border-radius: 50px;
+	margin: 30px auto;
+}
+.winner-list h3{
+	text-align: center;
+	font-weight: bold;
+	font-size: 28px;
+	background: red;
+	color: #FFD700;
+	width: 400px;
+	border-radius: 50px;
+	margin: 20px auto;
+}
+.print{
+	z-index: 10;
+	transform:rotate(-20deg);
+	position: absolute;
+	right: -100px;
+	bottom: -100px;
+	width: 280px;
+	height: 280px;
+	background: url(../img/print.png) no-repeat;
+	background-size: cover;
+}
+.btn-close{
+	color: #FFD700;
+	width: 50px;
+	height: 50px;
+	background: red;
+	border-radius: 25px;
+	position: absolute;
+	top: -100px;
+	right: -120px;
+	text-align: center;
+	font-weight: bold;
+	cursor: pointer;
+	font-size: 30px;
+	line-height: 50px;
+}

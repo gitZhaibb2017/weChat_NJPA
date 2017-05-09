@@ -1,0 +1,7 @@
+package com.paic.pawj.auth.dao;
+
+public interface AdminMapper {
+	
+	public Admin getAdmin(Admin admin);
+
+}

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>个人设置</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link href="../../css/main.css" rel="stylesheet"/>
+<link href="../../css/main2.css" rel="stylesheet"/>  
+<script type="text/javascript" src="/pawj/libs/easyui/zepto.js"></script>
+<script type="text/javascript" src="../../js/information.js"></script>
+</head>
+<body>
+	<header><i></i>
+		<span class="span">我的设置</span>
+	</header>
+	<div>
+		<div class="photoDiv">
+			<div class="photoInner">
+				<img src="../../images/icon_avatar.png" class="photo"> <img
+					src="../../images/icon_photo.png" class="photo_ca">
+			</div>
+			<br /> <br /> <br />
+			<p></p>
+		</div>
+	</div>
+	<div class="lineInfo2">
+			<ul>
+			  <li><span>姓名</span><span>ss</span><img
+							src="../../images/icon_open.png" ></li>
+			  <li><span>昵称</span><span id="nickName" ></span><img
+							src="../../images/icon_open.png" class="vl"></li>
+			  <li><span>性别</span><span id="sex" ></span><img
+							src="../../images/icon_open.png"></li>
+			  <li><span>职业</span><span id="profession" ></span><img
+							src="../../images/icon_open.png"></li>
+			</ul>
+			<div class="integralDetail" >完善身份资料</div>
+				
+		    </div>
+		    <ul >
+		      <li><span>实名认证</span><span >已认证</span></li>
+		      <li><span>绑定手机</span><span id="mobile" class="vl"></span></li>
+		      <li><span>绑定邮箱</span><span id="emaile" class="vl"></span></li>
+		    </ul>
+		
+
+	<div class="footer">
+		<input type="reset" class="res" value="退出登录"/>
+		</div>
+</body>
+</html>

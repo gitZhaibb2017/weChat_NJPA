@@ -1,0 +1,143 @@
+$(function(){
+	function getUrlParam(name){
+		var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+		var r = window.location.search.substr(1).match(reg);
+		if(r!=null){
+			return unescape(r[2]);
+		}
+		return null;
+	}
+	
+	var lowl = getUrlParam("lowL");
+	var level = null;
+	$(".title").click(function(){
+		$(".title").hide();
+		$(".five-prize2").show();
+		level = 6;
+	})
+	$(".five-prize2").click(function(){
+		$(".five-prize2").hide();
+		$(".five-prize1").show();
+		level = 5;
+	})
+	$(".five-prize1").click(function(){
+		$(".five-prize1").hide();
+		$(".four-prize").show();
+		level = 4;
+	})
+	$(".four-prize").click(function(){
+		$(".four-prize").hide();
+		$(".three-prize").show();
+		level = 3;
+	})
+	$(".three-prize").click(function(){
+		$(".three-prize").hide();
+		$(".two-prize").show();
+		level = 2;
+	})
+	$(".two-prize").click(function(){
+		$(".two-prize").hide();
+		$(".first-prize").show();
+		level = 1;
+	})
+	$(".first-prize").click(function(){
+		$(".first-prize").hide();
+		$(".title").show();
+		level = null;
+	})
+
+	function clearWinners(){
+		for(var i=0;i<10;i++){
+			$("#winner"+i).text("");
+		}
+	}
+	
+	function start(){
+		
+		$.ajax({
+			type : 'POST',
+			dataType : "json",
+			url : '/pawj/app/lottery/startVote.do',// 请求的action路径
+			data:{
+				level: level,
+				lowl: lowl
+			},
+			success : function(data) {
+			}
+		});
+	}
+	
+	function end(){
+		clearWinners();
+		$.ajax({
+			type : 'POST',
+			dataType : "json",
+			url : '/pawj/app/lottery/stopVote.do',// 请求的action路径
+			data:{
+				level: level,
+				lowl: lowl
+			},
+			success : function(data) {
+				started = false;
+				if ("0000" == data.retCode){
+//						alert(data.winners);
+					var name = "";
+					for(var i=0;i<data.winners.length;i++){
+						name = data.winners[i].userName + " " + data.winners[i].votedNum + "票";
+						if (data.winners[i].win){
+							name = name + "   中奖";
+						}
+						$("#winner"+i).text(name);
+					}
+				}
+				else{
+					alert("开始失败");
+				}
+			}
+		});
+	}
+	var started = false;
+	var isFirst = true;
+	$(".btn").click(function(){
+		if (!isFirst && level){
+			if (started){
+				end();
+			} else{
+				started = true;
+				start();
+			}
+		}
+		
+		isFirst = false;
+		if($(this).hasClass("btn-start")){
+			$(this).mousedown(function(){
+				$(this).removeClass("btn-start").addClass("btn-start-down");
+				$(this).mouseup(function(){
+					$(this).removeClass("btn-start-down").removeClass("btn-start").addClass("btn-end");
+					$(".gold").show();
+					$(".mark").hide();
+					$(".winner").hide();
+					$(".winner-list").hide();
+				})
+			})
+		}else if($(this).hasClass("btn-end")){
+			$(this).mousedown(function(){
+				$(this).removeClass("btn-end").addClass("btn-end-down");
+				$(this).mouseup(function(){
+					$(this).removeClass("btn-end-down").removeClass("btn-end").addClass("btn-start");
+					$(".gold").hide();
+					$(".mark").show();
+					$(".winner").show();
+					$(".winner-list").show();
+				})
+			})	
+		}
+	})
+	
+	$(".btn-close").click(function(){
+		$(".mark").hide();
+		$(".winner").hide();
+		$(".winner-list").hide();
+		$(".gold").hide();
+	})
+})

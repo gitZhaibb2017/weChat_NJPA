@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Insert title here</title>
+<script>
+function gotoMainPage(){
+	location.href = "wjadd/wjadd_index.html";
+}
+</script>
+</head>
+<body onLoad="gotoMainPage()">
+即将跳转至管理界面...
+</body>
+</html> 

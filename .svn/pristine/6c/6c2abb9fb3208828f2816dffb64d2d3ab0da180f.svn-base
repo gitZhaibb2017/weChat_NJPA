@@ -1,0 +1,49 @@
+//加载完毕调用
+$(function() {
+	init();
+});
+//初始化基础方法
+function init() {
+	initClick();
+}
+//获取问卷信息
+function initClick() {
+	getComment();
+};
+// 获取问卷信息
+function getComment() {
+	getMsg();
+}
+//回退
+function commBack(){
+	window.location.href = "../../h5/answer/conference.html";
+}
+//获取改变的金额
+function getMsg() {
+	var  investigationID =sessionStorage.getItem('investigationID');
+	$.ajax({
+		type : 'POST',
+		url : "/pawj/app/answer/theHottestComments.do",
+		data : {
+			'qsrId' : investigationID
+		},
+		dataType : "JSON",
+		success : function(data) {
+			if(!Validator.validateNull(data)){
+				var dt =$.parseJSON(data);
+				var pointChange = dt.account.pointChange;
+				var balanceChange = dt.account.balanceChange;
+				if(!Validator.validateNull(pointChange) || !Validator.validateNull(balanceChange)){
+					$('#comScore').html("+"+pointChange);
+					$('#comBalance').html("+"+balanceChange);
+				}else{
+					$('#comScore').html("+"+0);
+					$('#comBalance').html("+"+0);
+					
+				}
+			}else{
+				$.popAlert("获取奖励金额和积分失败!");
+			}
+		}
+	});
+}

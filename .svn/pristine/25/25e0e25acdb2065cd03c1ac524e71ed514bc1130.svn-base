@@ -1,0 +1,54 @@
+//获取余额信息
+$(function() {
+	getBalance();
+});
+
+//获取用户余额
+function getBalance() {
+	$.ajax({
+		type : 'POST',
+		url : "/pawj/app/person/queryBalanceDetail.do",
+		dataType : "JSON",
+		success : function(data) {
+			var h = "";
+			data = $.parseJSON(data);
+			if(data.infoMsg != 'fail'){
+				$.each(data,function(i,item){
+					var balance = '余额  '+item.balance;
+					var doTime = item.doTime;
+					var source = item.source;
+					var sum = item.sum;
+					var color = '';
+					if(source == '收益'){
+						sum = '+' + sum;
+						color = 'colorGet';
+					}else if(source == '充值'){
+						sum = '+' + sum; 
+						color = 'colorGet';
+					}else if(source == '提取'){
+						sum = '-' + sum; 
+						color = 'colorCash';
+					}else if(source == '消费'){
+						sum = '-' + sum; 
+						color = 'colorCost';
+					}
+					h += '<table class="balanceDetail">'
+						+'<tr>'
+						+'<td><span>'+balance+'</span></td><td><span class="color01">'+doTime+'</span></td>'
+						+'</tr>'
+						+'<tr>'
+						+'<td><span class="'+color+'">'+source+'</span></td><td><span style="font-size: 2rem;color:#333">'+sum+'</span></td>'
+						+'</tr>'
+						+'</table>';
+				})
+			}else{
+				h = '<div style="width: 100%;text-align: center;margin-top: 10px;">暂无明细</div>';
+			}
+			$('#detailTable').append(h);
+		}
+	});
+}
+
+function goBack(){
+	window.history.back();
+};

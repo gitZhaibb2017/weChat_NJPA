@@ -1,0 +1,25 @@
+package com.paic.pawj.basic.comment.dao;
+
+import java.sql.Date;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@Data
+public class Comment {
+	private int commentId;
+	
+	private String comment;
+	
+	private String commentType;
+	
+	private String status;
+	
+	private String publisher;
+	
+	private Date createTime;
+	
+	private String investigationId;
+
+}

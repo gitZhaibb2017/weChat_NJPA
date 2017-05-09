@@ -1,0 +1,114 @@
+//加载完毕调用
+$(function() {
+	init();
+});
+//初始化基础方法
+function init() {
+	initClick();
+}
+//获取问卷信息
+function initClick() {
+	getComment();
+};
+// 获取问卷信息
+function getComment() {
+	getMsg();
+}
+//回退
+function commBack(){
+	window.location.href = "../../h5/answer/conference.html";
+}
+//几颗星的评价
+function starChose(a){
+	for(var i=1;i<=5;i++){
+		$('#star'+i).removeClass("starOn");
+		$('#star'+i).addClass("star");
+	}
+	for(var i=1;i<=a;i++){
+		$('#star'+i).addClass("starOn");
+	}
+	$('#commentValue').attr("value",a);
+}
+//印象选择
+function comQa(e){
+	var attr=$('#'+e).attr('class');
+	if(attr == null || attr =="" || attr == undefined){
+		$('#'+e).addClass('evaluteMarkOn');
+	}else{
+		$('#'+e).removeClass('evaluteMarkOn');
+	}
+}
+//获取个人评价
+function getMsg() {
+	var  investigationID =sessionStorage.getItem('investigationID');
+	$.ajax({
+		type : 'POST',
+		url : "/pawj/app/answer/theHottestComments.do",
+		data : {
+			'qsrId' : investigationID
+		},
+		dataType : "JSON",
+		success : function(data) {
+			var dt=$.parseJSON(data);
+			$('#comScore').html("+"+dt.account.pointChange);
+			$('#comBalance').html("+"+dt.account.balanceChange);
+			var com="";
+			var obj= dt.comments;
+			$.each(obj,function(i,item){
+				com+='<li id="'+item.commentID+'" onclick="comQa(\''+item.commentID+'\')">'+item.comment+'</li>';
+			});
+			$('#comQa').append(com);
+		}
+	});
+}
+//提交
+function sub(){
+	//var dataArr = {};
+	var datalist = {};
+	var commentlist = [];
+	var com=[];
+	var  investigationID =sessionStorage.getItem('investigationID');//问卷ID
+	var comScore=$('#commentValue').val();//评分
+	var comment=$('#placeholder').val();//评价
+	if (Validator.validateNull(comScore)) {
+		alert("暂未评星");
+		return;
+	}
+	if (Validator.validateNull(comment)) {
+		alert("请输入您的印象");
+		return;
+	}
+	if (comment.length>20) {
+		alert("印象20字以内");
+		return;
+	}
+	$('.evaluteMarkOn').each(function(index,item){
+		
+		var comId = item.id; 
+		commentlist.push(
+				{"commentID":comId,
+				"comment":comment});
+	});
+	datalist={
+			"qsrId":investigationID,
+			"score":comScore,
+			"comments":commentlist
+		};
+	var obj ={};
+	obj.data=datalist;
+	$.ajax({
+		type : 'POST',
+		url : "/pawj/app/answer/investigationComments.do",
+		data: JSON.stringify(obj),
+		dataType:'json',
+		contentType:"application/json",
+		success : function(data) {
+			if(data.retCode=="0000"){
+				window.location.href = "../../h5/answer/conference.html";
+				}
+				else{
+					window.location.href = "../../h5/homePage/index.html";
+				}
+		}
+	});
+}

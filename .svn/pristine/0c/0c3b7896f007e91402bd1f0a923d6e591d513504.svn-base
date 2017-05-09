@@ -1,0 +1,49 @@
+package com.paic.pawj.basic.grade.dao;
+
+import java.util.List;
+import java.util.Map;
+
+public interface GradeMapper {
+
+	/**
+	 * 查询当前用户下一等级的升级规则
+	 */
+	public List<Grade> queryUserGrade(Map<String, Object> paramMap);
+	
+	/**
+	 * 获得当前用户的下一个等级
+	 * @param paramMap
+	 * @return
+	 */
+	public int getUserNextGrade(Map<String, Object> paramMap);
+	
+	/**
+	 * 获得连续活跃天数，大于N天
+	 */
+	public int getActiveDays(Map<String, Object> paramMap);
+	
+	/**
+	 * 获得参与调查问卷次数，days天内的答题记录
+	 */
+	public int getAnswerTimesDays(Map<String, Object> paramMap);
+	
+	/**
+	 * 获得参与调查问卷次数，大于N次
+	 */
+	public int getAnswerTimes(Map<String, Object> paramMap);
+	
+	/**
+	 * 获得上次登录时间
+	 */
+	public String getPervLoingTime(Map<String, Object> paramMap);
+	
+	/**
+	 * 升级
+	 */
+	public void updateUserInfoGrade(Map<String, Object> paramMap);
+	
+	/**
+	 * 获得用户当前等级
+	 */
+	public Map<String, Object> getUserCurrentGrade(Map<String, Object> paramMap);
+}

@@ -1,0 +1,21 @@
+package com.paic.pawj.answer.dao;
+
+import java.sql.Date;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@Data
+public class InvestigationComment {
+	private String investigationID;
+	
+	private int commentID;
+	
+	private String answerer;
+	
+	private Date createTime;
+	
+	private String comment;
+
+}

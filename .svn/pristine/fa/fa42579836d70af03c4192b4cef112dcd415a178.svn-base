@@ -1,0 +1,25 @@
+package com.paic.pawj.common.service.impl;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.paic.pawj.common.dao.CommonMapper;
+import com.paic.pawj.common.dao.DictionaryDetailDAO;
+import com.paic.pawj.common.service.CommonService;
+
+@Service("commonService")
+public class CommonServiceImpl implements CommonService{
+
+	@Resource
+	private CommonMapper CommonMapper;
+	
+	@Override
+	public List<DictionaryDetailDAO> getDictionaryDetial(String code) {
+		return CommonMapper.getDictionaryDetial(code);
+	}
+	
+
+}

@@ -1,0 +1,18 @@
+package com.paic.pawj.auth.dto;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class CheckCodeDTO implements java.io.Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7214555438446278301L;
+	private String checkId;
+	private String checkCode;
+	private String sendTime;
+	private String mobile;
+	private int isUsed;
+}
