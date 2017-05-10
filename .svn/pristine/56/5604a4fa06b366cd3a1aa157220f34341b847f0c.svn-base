@@ -1,9 +1,0 @@
-package com.paic.pawj.common.service;
-
-import java.util.List;
-
-import com.paic.pawj.common.dao.DictionaryDetailDAO;
-
-public interface CommonService {
-	public List<DictionaryDetailDAO> getDictionaryDetial(String Code);
-}

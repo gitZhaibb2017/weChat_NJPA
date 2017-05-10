@@ -1,6 +1,0 @@
-package com.paic.pawj.basic.redis;
-
-public class RedisConstants {
-	public static final String APP_TOKEN_PIX = "app.token.";
-	
-}

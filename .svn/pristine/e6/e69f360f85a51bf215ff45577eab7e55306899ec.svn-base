@@ -1,7 +1,0 @@
-package com.paic.pawj.basic.account.service;
-
-public interface AccountChangeService {
-	
-	public void changeAccountByIvtg(String userID, String ivtgID);
-
-}
